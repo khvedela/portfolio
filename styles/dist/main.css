@@ -53,13 +53,10 @@ body,
 html {
   margin: 0;
   font-family: poppins, Arial;
+  overflow: hidden;
 }
 
 header {
   z-index: 1;
-}
-
-.canvas {
-  overflow: hidden;
 }
 /*# sourceMappingURL=main.css.map */
