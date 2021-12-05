@@ -1,0 +1,15 @@
+@import '_reset.scss';
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+body,
+html {
+    margin: 0;
+    font-family: poppins, Arial;
+}
+header {
+    z-index: 1;
+}
+#container {
+    z-index: 0;
+    position: absolute;
+}
