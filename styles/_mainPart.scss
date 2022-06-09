@@ -1,0 +1,13 @@
+main {
+    width: 100vw;
+    height: 100vh;
+
+    iframe {
+        z-index: 99;
+    }
+
+    i {
+        position: absolute;
+        z-index: 1;
+    }
+}
