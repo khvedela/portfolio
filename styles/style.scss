@@ -1,0 +1,243 @@
+@import '_reset.scss';
+@import '_mixins.scss';
+@import '_mics.scss';
+
+//poppins
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+html,
+body {
+    min-height: 100% !important;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+section {
+    height: calc(100% - 145px);
+}
+
+nav {
+    @include flex($justify: center, $align-items: center);
+    padding: 4rem 4rem 0 4rem;
+
+    .container {
+        @include flex($justify: space-between, $align-items: center);
+        padding: 0 0 30px 0;
+        border-bottom: 1px solid rgba(113, 113, 113, 0.322);
+
+        h1 {
+            @include font($size: 1.5em);
+
+            &::after {
+                content: '';
+                display: inline-block;
+                height: .35em;
+                width: .35em;
+                background: red;
+                border-radius: 50%;
+                margin-left: 5px;
+            }
+        }
+
+        .links {
+            ul {
+                @include flex($gap: 1rem);
+
+                li {
+                    @include font($size: 1.2em);
+                    cursor: pointer;
+                    transition: all 200ms ease-in;
+
+                    &:hover {
+                        font-weight: 800;
+                    }
+                }
+            }
+        }
+
+        .cv {
+            button {
+                @include font($weight: 600);
+                @include button($border: 1px solid black);
+            }
+        }
+    }
+}
+
+main {
+    @include flex($justify: center);
+    padding: 0 4rem 0 4rem;
+    height: 100%;
+
+    .container {
+        @include flex();
+
+        .right {
+            width: 50vw;
+            @include flex($direction: column, $justify: space-between);
+
+            .hero-text {
+                padding: 50% 0 0 0;
+                @include flex($direction: column, $gap: 3rem);
+
+                .wrapper-inline {
+                    gap: 6rem;
+                }
+
+                h1 {
+                    @include font($size: 4rem);
+                    line-height: 60px;
+                    font-weight: 600;
+                    text-align: justify;
+                }
+
+                span {
+                    @include font($size: 1.5rem);
+                    color: white;
+                    background-color: #5562ff;
+                    border-radius: 30px;
+                    padding: 15px;
+                    text-align: center;
+                }
+
+                h4 {
+                    @include font($size: 1.2em);
+                    // max-width: 450px;
+                }
+
+                .buttons {
+                    button {
+                        @include font();
+                        @include button($background: transperent);
+
+                        &:hover {
+                            @include button($border: 1px solid black, $background: transperent);
+                        }
+                    }
+
+                    button:first-child {
+                        @include font();
+                        @include button($background: #fe481c, $color: white);
+                    }
+                }
+            }
+
+            .bottom-part {
+                height: 30%;
+                width: 100%;
+                background-color: #262626;
+                padding: 0px 0px 0px 50px;
+
+                @include flex($direction: column, $align-items: flex-start, $justify: space-around) .bottom-left {
+                    @include flex($align-items: center, $gap: 5rem);
+                    @include font($size: 2em);
+                    color: white;
+
+                    button {
+                        @include button($background: #ffd100, $color: black);
+                    }
+                }
+
+                .bottom-right {
+                    color: white;
+                    @include font($size: 1em);
+                    @include flex($direction: row, $gap: 1.5rem);
+                }
+            }
+        }
+
+        .left {
+            width: 50vw;
+            background-color: red;
+            overflow: hidden;
+            position: relative;
+            @include flex($justify: center, $align-items: center);
+
+            img {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 150%;
+                position: absolute;
+            }
+        }
+    }
+}
+
+.active {
+    font-weight: 800;
+
+    &::after {
+        content: '';
+        display: inline-block;
+        height: .35em;
+        width: .35em;
+        margin-left: 3px;
+        background: red;
+        border-radius: 50%;
+    }
+}
+
+#work {
+    .container-main {
+        @include flex($justify: center);
+        height: 100%;
+        width: 100%;
+
+        .container {
+            padding: 4rem 4rem 0 4rem;
+            @include flex($direction: column, $align-items: center, $gap: 1rem);
+
+            .header-text {
+                @include font($size: 2rem, $weight: 600);
+                color: #111111;
+            }
+
+            .work-card {
+                height: 500px;
+                @include flex();
+
+
+                .card-left {
+                    background-color: #262626;
+                    
+                    .container-text {
+                        @include flex($direction: column, $gap: 2rem, $align-items: flex-start);
+                    }
+
+                    h1 {
+                        @include font($size: 2rem, $weight: 500);
+                    }
+
+                    h2 {
+                        @include font($size: 1rem);
+                    }
+                    color: white;
+                    padding: 4rem 4rem 0 4rem;
+
+                    ul {
+                        list-style-type: circle;
+                        @include font();
+                        @include flex($direction: column, $gap: 1rem)
+                    }
+                }
+
+                .card-right {
+                    width: 30%;
+                    overflow: hidden;
+                    @include flex($justify: center, $align-items: center);
+                    
+                    img {
+                        width: 300%;
+                        object-fit: contain;
+                    }
+
+                    img:first-child {
+                        width: 5%;
+                        position: absolute;
+                    }
+                }
+            }
+        }
+    }
+}

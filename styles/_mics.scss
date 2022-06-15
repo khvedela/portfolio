@@ -1,0 +1,39 @@
+.active {
+    font-weight: 800;
+    text-transform: uppercase;
+
+    &::after {
+        content: '';
+        display: inline-block;
+        height: .35em;
+        width: .35em;
+        margin-left: 3px;
+        background: red;
+        border-radius: 50%;
+    }
+}
+
+.wrapper-inline {
+    display: flex;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1280px;
+}
+
+button {
+    @include button();
+}
+
+::-moz-selection {
+    /* Code for Firefox */
+    color: white;
+    background: #fe481c;
+}
+
+::selection {
+    color: white;
+    background: #fe481c;
+}

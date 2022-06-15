@@ -1,0 +1,28 @@
+@mixin font($font: poppins, $size: 1rem, $weight: normal) {
+    font-family: $font;
+    font-size: $size;
+    font-weight: $weight;
+}
+
+@mixin flex($direction: row, $gap: 0, $justify: normal, $align-items: normal) {
+    display: flex;
+    flex-direction: $direction;
+    gap: $gap;
+    justify-content: $justify;
+    align-items: $align-items;
+}
+
+@mixin button($background: rgba(255, 255, 255, 0), $border: 0, $radius: 0, $color: black) {
+    width: 150px;
+    height: 50px;
+    background-color: $background;
+    border: $border;
+    border-radius: $radius;
+    color: $color;
+    cursor: pointer;
+    transition: all 150ms ease-in;
+
+    &:hover {
+        transform: scale(1.01);
+    }
+}
