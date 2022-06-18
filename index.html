@@ -16,11 +16,11 @@
             <h1>David</h1>
             <div class="links">
                 <ul>
-                    <li onclick="route('home')" class="active">home</li>
-                    <li onclick="route('work')">work</li>
-                    <li onclick="route('about')">about</li>
-                    <li onclick="route('projects')">projects</li>
-                    <li onclick="route('contact')">contact</li>
+                    <li onclick="route('home')" class="home active">home</li>
+                    <li onclick="route('work')" class="work">work</li>
+                    <li onclick="route('about')" class="about">about</li>
+                    <li onclick="route('projects')" class="projects">projects</li>
+                    <li onclick="route('contact')" class="contact">contact</li>
                 </ul>
             </div>
             <div class="cv">
@@ -71,7 +71,7 @@
     <section id="work">
         <div class="container-main">
             <div class="container">
-                <h1 class="header-text">Work Experience:</h1>
+                <h1 class="header-text">Work Experience</h1>
                 <div class="work-card">
                     <div class="card-left">
                         <div class="container-text">
@@ -98,13 +98,65 @@
             </div>
         </div>
     </section>
-    <section id="about" style="background-color: green;"></section>
-    <section id="projects" style="background-color: blue;"></section>
-    <section id="contact" style="background-color: black;"></section>
+    <section id="about">
+        <div class="container-main">
+            <div class="container">
+                <div class="left-about-me">
+                    <img src="assets/me2.jpg" alt="david khvedelidze">
+                </div>
+                <div class="right-about-me">
+                    <h1>About Me</h1>
+                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ex aspernatur facere pariatur laborum molestias culpa libero, repellat consequatur exercitationem quisquam fugit aut ducimus neque est excepturi dolorum labore dignissimos officiis facilis. Nulla quae, rem obcaecati officia quaerat sit, id odio, hic ipsum quam explicabo saepe rerum est eos nemo aperiam.</p>
+                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ex aspernatur facere pariatur laborum molestias culpa libero, repellat consequatur exercitationem quisquam fugit aut ducimus neque est excepturi dolorum labore dignissimos officiis facilis. Nulla quae, rem obcaecati officia quaerat sit, id odio, hic ipsum quam explicabo saepe rerum est eos nemo aperiam.</p>
+                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ex aspernatur facere pariatur laborum molestias culpa libero, repellat consequatur exercitationem quisquam fugit aut ducimus neque est excepturi dolorum labore dignissimos officiis facilis. Nulla quae, rem obcaecati officia quaerat sit, id odio, hic ipsum quam explicabo saepe rerum est eos nemo aperiam.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="projects">
+        <div class="container-main">
+            <div class="container">
+                <div class="project-card projOne">
+                    <h1>Cool website name</h1>
+                </div>
+
+                <div class="project-card projTwo">
+                    <h1>WeeWeeee</h1>
+                </div>
+
+                <div class="project-card projThree">
+                    <h1>Coffee mmmm</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="contact">
+        <div class="container-main">
+            <div class="container">
+                <div class="subject">
+                    <label for="subject">subject</label>
+                    <input type="text" class="subejctText" name="subject" placeholder="subject">
+                </div>
+
+                <div class="body">
+                    <label for="body">body</label>
+                    <textarea name="body" class="bodyText" cols="30" rows="5"></textarea>
+                </div>
+                <button onclick="openEmail()">send</button>
+            </div>
+        </div>
+    </section>
 
     <script src="scripts/animations.js" type="module"></script>
     <!-- GSAP - animations -->
     <script src="scripts/router.js"></script>
+    <script>
+        function openEmail() {
+            const subject = document.querySelector('.subejctText').value;
+            const body = document.querySelector('.bodyText').value;
+            window.open(`mailto:davit.khvedelidze.2@btu.edu.ge?subject=${subject}&body=${body}`);
+        }
+    </script>
 </body>
 
 </html>

@@ -1,15 +1,23 @@
-const image = document.getElementById('image');
-const bottom = document.getElementById('bottom');
-const mainText = document.getElementById('main-text');
-const cardLeft = document.querySelector('.card-left');
-const cardRight = document.querySelector('.card-right');
-const containerText = document.querySelector('.container-text');
+const projOne = document.querySelector('.projOne');
+const projTwo = document.querySelector('.projTwo');
+const projThree = document.querySelector('.projThree');
 
-const tl = gsap.timeline();
+const tl = gsap.timeline()
 
-tl.from(image, {y: 100, opacity: 0, duration: 1});
-tl.from(bottom, {x: 100, opacity: 0, duration: 1});
-tl.from(mainText, {x: -100, opacity: 0, duration: 1});
-tl.from(cardLeft, {width: 0, opacity: 0, duration: 1});
-tl.from(cardRight, {height: 0, opacity: 0, duration: 1});
-tl.from(containerText, {opacity: 0, duration: 1});
+projOne.addEventListener('click', () => {
+    tl.to(projOne, {x: 1000, opacity: 0, duration: 0.3, ease: "power3.out"});
+    tl.from(projOne, {x: -1000, opacity: 0, duration: 0.3, ease: "power3.out"});
+    window.open('https://github.com/khvedela')
+});
+
+projTwo.addEventListener('click', () => {
+    tl.to(projTwo, {x: 1000, opacity: 0, duration: 0.3, ease: "power3.out"});
+    tl.from(projTwo, {x: -1000, opacity: 0, duration: 0.3, ease: "power3.out"});
+    window.open('https://github.com/khvedela')
+});
+
+projThree.addEventListener('click', () => {
+    tl.to(projThree, {x: 1000, opacity: 0, duration: 0.3, ease: "power3.out"});
+    tl.from(projThree, {x: -1000, opacity: 0, duration: 0.3, ease: "power3.out"});
+    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+});
