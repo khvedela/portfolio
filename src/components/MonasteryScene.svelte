@@ -5,9 +5,7 @@
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
   import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-	import { convertMeshesVenom } from '../utils/convertMeshesVenom';
-
-  // Example wireframe logic or Venom-like logic
+  import { convertMeshesVenom } from '../utils/convertMeshesVenom';
 
   let scene: THREE.Scene;
   let camera: THREE.PerspectiveCamera;
@@ -25,30 +23,57 @@
 
   const dispatch = createEventDispatcher();
 
-  function loadModel() {
+  // Environment variables
+  const WORKER_URL = import.meta.env.VITE_WORKER_URL;
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  // Function to generate a signed token
+  async function generateSignedToken(secretKey: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(secretKey);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+  }
+
+  async function loadModel() {
     const loader = new GLTFLoader();
-    loader.load(
-      '/Santes Creus Monastery.glb',
-      (gltf: GLTF) => {
-        monastery = gltf.scene;
-        convertMeshesVenom(monastery);
-        // Optionally compute bounding box to set revealMinY, revealMaxY
-        computeBoundingBox(monastery);
 
-        monastery.position.set(0, 0, 0);
-        monastery.scale.set(1, 1, 1);
-        monasteryGroup.add(monastery);
+    try {
+      // Generate the signed token
+      const token = await generateSignedToken(SECRET_KEY);
 
-        isLoading = false;
-        dispatch('loaded');
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading model:', error);
-        isLoading = false;
-        dispatch('loaded');
-      }
-    );
+      // URL-encode the file name
+      const fileName = encodeURIComponent("SantesCreusMonastery.glb");
+
+      // Construct the secure URL with the encoded filename
+      const modelUrl = `${WORKER_URL}/${fileName}?token=${token}`;
+
+      // Load the model
+      loader.load(
+        modelUrl,
+        (gltf: GLTF) => {
+          monastery = gltf.scene;
+          convertMeshesVenom(monastery);
+          computeBoundingBox(monastery);
+
+          monastery.position.set(0, 0, 0);
+          monastery.scale.set(1, 1, 1);
+          monasteryGroup.add(monastery);
+
+          isLoading = false;
+          dispatch('loaded');
+        },
+        undefined,
+        (error) => {
+          console.error('Error loading model:', error);
+          isLoading = false;
+          dispatch('loaded');
+        }
+      );
+    } catch (error) {
+      console.error('Error generating token or loading model:', error);
+      isLoading = false;
+    }
   }
 
   function computeBoundingBox(obj: THREE.Object3D) {
@@ -73,7 +98,7 @@
       });
     }
 
-    // Example: rotate the group slowly, if you want
+    // Rotate the group slowly
     monasteryGroup.rotation.y += 0.0005;
 
     composer.render();
@@ -150,8 +175,8 @@
 
 <style>
   :global(html, body) {
-    margin: 0; 
-    padding: 0; 
+    margin: 0;
+    padding: 0;
     overflow: hidden;
   }
 </style>
