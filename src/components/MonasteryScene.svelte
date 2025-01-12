@@ -5,7 +5,8 @@
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
   import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-  import { convertMeshesVenom } from '../utils/convertMeshesVenom';
+  import { dustVertex, dustFragment } from '../shaders/DustShaders';
+  import { venomWireVertex, venomWireFragment } from '../shaders/VenomWireShaders';
 
   let scene: THREE.Scene;
   let camera: THREE.PerspectiveCamera;
@@ -13,6 +14,7 @@
   let composer: EffectComposer;
   let monasteryGroup: THREE.Group;
   let monastery: THREE.Group | null = null;
+  let particleSystem: THREE.Points | null = null;
 
   let isLoading = true;
   let revealHeight = 0;
@@ -23,11 +25,13 @@
 
   const dispatch = createEventDispatcher();
 
-  // Environment variables
+  // Mouse-related variables
+  let mouse = new THREE.Vector2();
+  let particleAttraction = new THREE.Vector3(0, 0, 0);
+
   const WORKER_URL = import.meta.env.VITE_WORKER_URL;
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
-  // Function to generate a signed token
   async function generateSignedToken(secretKey: string): Promise<string> {
     const encoder = new TextEncoder();
     const data = encoder.encode(secretKey);
@@ -37,29 +41,19 @@
 
   async function loadModel() {
     const loader = new GLTFLoader();
-
     try {
-      // Generate the signed token
       const token = await generateSignedToken(SECRET_KEY);
-
-      // URL-encode the file name
       const fileName = encodeURIComponent("SantesCreusMonastery.glb");
-
-      // Construct the secure URL with the encoded filename
       const modelUrl = `${WORKER_URL}/${fileName}?token=${token}`;
-
-      // Load the model
       loader.load(
         modelUrl,
         (gltf: GLTF) => {
           monastery = gltf.scene;
-          convertMeshesVenom(monastery);
+          applyVenomWireShader(monastery);
           computeBoundingBox(monastery);
-
           monastery.position.set(0, 0, 0);
           monastery.scale.set(1, 1, 1);
           monasteryGroup.add(monastery);
-
           isLoading = false;
           dispatch('loaded');
         },
@@ -84,10 +78,112 @@
     revealHeight = revealMinY;
   }
 
+  function setupParticles() {
+    const particleCount = 3000;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 50;
+      positions[i * 3 + 1] = Math.random() * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+
+      velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 1] = Math.random() * 0.02 + 0.01;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+
+      sizes[i] = Math.random() * 0.02 + 0.1;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader: dustVertex,
+      fragmentShader: dustFragment,
+      uniforms: {
+        uTime: { value: 0 },
+        uMouse: { value: new THREE.Vector3(0, 0, 0) },
+      },
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
+  }
+
+  function animateParticles(delta: number) {
+    if (!particleSystem) return;
+    const positions = particleSystem.geometry.attributes.position.array as Float32Array;
+    const velocities = particleSystem.geometry.attributes.velocity.array as Float32Array;
+
+    for (let i = 0; i < positions.length / 3; i++) {
+      // Apply particle attraction toward the mouse
+      const dx = particleAttraction.x - positions[i * 3];
+      const dy = particleAttraction.y - positions[i * 3 + 1];
+      const dz = particleAttraction.z - positions[i * 3 + 2];
+      const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+      if (distance < 5.0) {
+        positions[i * 3] += dx * 0.02;
+        positions[i * 3 + 1] += dy * 0.02;
+        positions[i * 3 + 2] += dz * 0.02;
+      }
+
+      positions[i * 3] += velocities[i * 3];
+      positions[i * 3 + 1] += velocities[i * 3 + 1];
+      positions[i * 3 + 2] += velocities[i * 3 + 2];
+
+      if (positions[i * 3 + 1] > 30 || positions[i * 3 + 1] < -10) {
+        positions[i * 3] = (Math.random() - 0.5) * 50;
+        positions[i * 3 + 1] = -10;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+      }
+    }
+
+    particleSystem.geometry.attributes.position.needsUpdate = true;
+    particleSystem.material.uniforms.uTime.value += delta;
+    particleSystem.material.uniforms.uMouse.value = particleAttraction;
+  }
+
+  function applyVenomWireShader(object3D: THREE.Object3D) {
+    object3D.traverse((child: any) => {
+      if (child.isMesh && child.geometry) {
+        const geometry = child.geometry;
+        const randY = new Float32Array(geometry.attributes.position.count);
+        for (let i = 0; i < randY.length; i++) {
+          randY[i] = (Math.random() - 0.5) * 5.0;
+        }
+        geometry.setAttribute('aRandY', new THREE.BufferAttribute(randY, 1));
+
+        child.material = new THREE.ShaderMaterial({
+          vertexShader: venomWireVertex,
+          fragmentShader: venomWireFragment,
+          uniforms: {
+            uTime: { value: 0 },
+            uRevealHeight: { value: 0 },
+            uBaseColor: { value: new THREE.Color(0xffffff) },
+            uAccentColor: { value: new THREE.Color(0xdc143c) },
+          },
+          transparent: true,
+          wireframe: true,
+        });
+      }
+    });
+  }
+
   function animateScene() {
     requestAnimationFrame(animateScene);
+    const delta = clock.getDelta();
 
-    // Animate reveal from bottom to top
+    if (particleSystem) animateParticles(delta);
+    if (monasteryGroup) monasteryGroup.rotation.y += 0.001;
+
     if (monastery && revealHeight < revealMaxY) {
       revealHeight += revealSpeed;
       if (revealHeight > revealMaxY) revealHeight = revealMaxY;
@@ -98,9 +194,6 @@
       });
     }
 
-    // Rotate the group slowly
-    monasteryGroup.rotation.y += 0.0005;
-
     composer.render();
   }
 
@@ -108,12 +201,11 @@
     composer = new EffectComposer(renderer);
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
-
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.5,
-      0.2,
-      0.85
+      1.0,
+      0.3,
+      0.9
     );
     composer.addPass(bloomPass);
   }
@@ -124,12 +216,15 @@
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
     directionalLight.position.set(10, 20, 10);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
-    directionalLight.shadow.camera.near = 0.1;
-    directionalLight.shadow.camera.far = 100;
     scene.add(directionalLight);
+  }
+
+  function onMouseMove(event: MouseEvent) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera);
+    particleAttraction.copy(vector);
   }
 
   onMount(() => {
@@ -139,30 +234,28 @@
     monasteryGroup = new THREE.Group();
     scene.add(monasteryGroup);
 
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(window.devicePixelRatio);
 
-    camera = new THREE.PerspectiveCamera(95, window.innerWidth / window.innerHeight, 0.1, 500);
-    camera.position.set(-3, 8, 15);
-    scene.add(camera);
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 10, 20);
 
     addLights();
+    setupParticles();
     setupBloom();
     loadModel();
     animateScene();
 
-    window.addEventListener('resize', onWindowResize);
-    return () => window.removeEventListener('resize', onWindowResize);
-  });
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
 
-  function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  }
+    window.addEventListener('mousemove', onMouseMove);
+  });
 </script>
 
 <canvas id="bg-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none"></canvas>

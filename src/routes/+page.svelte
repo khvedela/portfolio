@@ -7,10 +7,10 @@
   let isSceneLoaded = false;
   let introSection: HTMLElement;
   let aboutSection: HTMLElement;
-  let text1: HTMLElement;
-  let text2: HTMLElement;
+  let text1: HTMLElement | null = null;
+  let text2: HTMLElement | null = null;
 
-  const texts = ["David Khvedelidze", "Full Stack Engineer", "Web Entusiast"];
+  const texts = ["David Khvedelidze", "Full Stack Engineer", "Web Enthusiast"];
   let textIndex = texts.length - 1;
   let time = new Date();
   const morphTime = 2;
@@ -20,32 +20,59 @@
 
   const handleSceneLoad = () => {
     isSceneLoaded = true;
-    morphTexts();
+
+    // Retry initialization if text elements are not ready
+    if (text1 && text2) {
+      console.log('Text elements initialized. Starting morphing.');
+      morphTexts();
+    } else {
+      console.warn('Text elements not ready. Retrying initialization...');
+      retryInitialization();
+    }
+  };
+
+  const retryInitialization = () => {
+    const interval = setInterval(() => {
+      if (text1 && text2) {
+        console.log('Text elements are now initialized.');
+        clearInterval(interval);
+        morphTexts();
+      }
+    }, 100); // Retry every 100ms
   };
 
   const morphTexts = () => {
     const doMorph = () => {
       morph -= cooldown;
       cooldown = 0;
+
       let fraction = morph / morphTime;
       if (fraction > 1) {
         cooldown = cooldownTime;
         fraction = 1;
       }
+
       setMorph(fraction);
     };
 
     const setMorph = (fraction: number) => {
-      text2.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
-      text2.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
-      fraction = 1 - fraction;
-      text1.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
-      text1.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
+      if (!text1 || !text2) return;
+
+      const blurAmount1 = Math.min(8 / (1 - fraction) - 8, 100);
+      const blurAmount2 = Math.min(8 / fraction - 8, 100);
+
+      text1.style.filter = `blur(${blurAmount1}px)`;
+      text1.style.opacity = `${1 - fraction}`;
       text1.textContent = texts[textIndex % texts.length];
+
+      text2.style.filter = `blur(${blurAmount2}px)`;
+      text2.style.opacity = `${fraction}`;
       text2.textContent = texts[(textIndex + 1) % texts.length];
     };
 
     const doCooldown = () => {
+      if (!text1 || !text2) return;
+
       morph = 0;
       text2.style.filter = "";
       text2.style.opacity = "100%";
@@ -55,11 +82,13 @@
 
     const animate = () => {
       requestAnimationFrame(animate);
-      let newTime = new Date();
-      let shouldIncrementIndex = cooldown > 0;
-      let dt = (newTime.getTime() - time.getTime()) / 1000;
+      const newTime = new Date();
+      const shouldIncrementIndex = cooldown > 0;
+      const dt = (newTime.getTime() - time.getTime()) / 1000;
       time = newTime;
+
       cooldown -= dt;
+
       if (cooldown <= 0) {
         if (shouldIncrementIndex) textIndex++;
         doMorph();
@@ -67,11 +96,16 @@
         doCooldown();
       }
     };
+
     animate();
   };
 
   onMount(() => {
-    // No scroll logic here now
+    console.log('Attempting initialization', new Date());
+    if (!text1 || !text2) {
+      console.warn('Text elements are not bound properly on mount. Retrying...');
+      retryInitialization();
+    }
   });
 </script>
 
@@ -89,17 +123,7 @@
   </svg>
 
   {#if isSceneLoaded}
-    <!-- <header
-      class="fixed top-0 left-0 w-full px-6 py-4 flex justify-center items-center z-20"
-      in:fade={{ duration: 800 }}
-    >
-      <nav class="relative flex gap-8 text-lg font-bold medieval-font text-white">
-        <a href="#intro" class="nav-link">Home</a>
-        <a href="#about" class="nav-link">About</a>
-        <a href="#projects" class="nav-link">Projects</a>
-        <a href="#contact" class="nav-link">Contact</a>
-      </nav>
-    </header> -->
+    <!-- Navigation placeholder if needed -->
   {/if}
 
   <MonasteryScene on:loaded={handleSceneLoad} />
@@ -123,7 +147,7 @@
       </div>
     </section>
 
-    <!-- Extra placeholders -->
+    <!-- Placeholder sections -->
     <section class="w-full h-screen"></section>
     <section class="w-full h-screen"></section>
     <section class="w-full h-screen"></section>
@@ -137,29 +161,18 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
   }
-  .medieval-font {
-    font-family: 'Cinzel', serif;
-  }
-  .nav-link {
-    position: relative;
-    text-decoration: none;
-    color: #fff;
-    transition: color 0.3s ease, text-shadow 0.3s ease;
-  }
-  .nav-link:hover {
-    color: #d4af37;
-    text-shadow: 0 0 8px #d4af37, 0 0 16px #d4af37;
-  }
+
   #container {
     position: relative;
     filter: url(#threshold) blur(0.6px);
   }
+
   #text1,
   #text2 {
     position: absolute;
@@ -167,9 +180,6 @@
     font-family: 'Cinzel', serif;
     color: #8B0000;
     user-select: none;
-    text-shadow:
-      0 0 6px  #8B0000,
-      0 0 10px #8B0000,
-      0 0 20px #8B0000;
+    text-shadow: 0 0 6px #8B0000, 0 0 10px #8B0000, 0 0 20px #8B0000;
   }
 </style>
