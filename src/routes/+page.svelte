@@ -253,17 +253,17 @@
 			></div>
 
 			<!-- Content -->
-			<div class="relative z-10 grid h-full w-full grid-cols-12 gap-4 px-6 py-16">
+			<div class="relative z-10 grid h-full w-full grid-cols-12 gap-4 px-4 py-12 md:px-6 md:py-16">
 				<!-- Heading -->
 				<h1
-					class="col-start-2 col-end-12 text-center text-5xl font-extrabold leading-tight text-white md:text-4xl lg:col-start-3 lg:col-end-11 lg:text-6xl"
+					class="col-span-12 text-center text-4xl font-extrabold leading-tight text-white sm:text-5xl md:text-6xl"
 				>
 					About Me
 				</h1>
 
 				<!-- Subtext -->
 				<p
-					class="col-start-2 col-end-12 text-center text-lg leading-relaxed text-gray-300 md:text-xl lg:col-start-3 lg:col-end-11 lg:text-2xl"
+					class="col-span-12 text-center text-base leading-relaxed text-gray-300 sm:text-lg md:text-xl"
 				>
 					I'm David Khvedelidze, a passionate Full Stack Engineer dedicated to creating dynamic and
 					responsive web applications. With a keen eye for design and a love for technology, I
@@ -272,7 +272,7 @@
 
 				<!-- Skills Grid -->
 				<div
-					class="col-start-2 col-end-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-start-3 lg:col-end-11 lg:grid-cols-3"
+					class="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:col-start-2 lg:col-end-12"
 				>
 					<!-- Skill Card 1 -->
 					<div
@@ -280,7 +280,7 @@
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-12 w-12 text-[#ff4d4d]"
+							class="h-10 w-10 text-[#ff4d4d] sm:h-12 sm:w-12"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -298,8 +298,8 @@
 								d="M12 2v4m0 16v4m10-10h-4M6 12H2"
 							/>
 						</svg>
-						<h3 class="mt-4 text-xl font-semibold text-white">Web Development</h3>
-						<p class="mt-2 text-center text-gray-400">
+						<h3 class="mt-3 text-lg font-semibold text-white sm:text-xl">Web Development</h3>
+						<p class="mt-2 text-center text-sm text-gray-400 sm:text-base">
 							Expertise in building responsive and dynamic web applications using modern frameworks
 							and technologies.
 						</p>
@@ -311,7 +311,7 @@
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-12 w-12 text-[#ff4d4d]"
+							class="h-10 w-10 text-[#ff4d4d] sm:h-12 sm:w-12"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -329,19 +329,20 @@
 								d="M12 2v4m0 16v4m10-10h-4M6 12H2"
 							/>
 						</svg>
-						<h3 class="mt-4 text-xl font-semibold text-white">UI/UX Design</h3>
-						<p class="mt-2 text-center text-gray-400">
+						<h3 class="mt-3 text-lg font-semibold text-white sm:text-xl">UI/UX Design</h3>
+						<p class="mt-2 text-center text-sm text-gray-400 sm:text-base">
 							Creating intuitive and visually appealing designs that enhance user experience.
 						</p>
 					</div>
 
+					<!-- Additional Skill Cards -->
 					<!-- Skill Card 3 -->
 					<div
 						class="flex flex-col items-center justify-center rounded-lg bg-gray-800 p-6 shadow-md transition-shadow duration-300 hover:shadow-xl"
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-12 w-12 text-[#ff4d4d]"
+							class="h-10 w-10 text-[#ff4d4d] sm:h-12 sm:w-12"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -359,12 +360,14 @@
 								d="M12 2v4m0 16v4m10-10h-4M6 12H2"
 							/>
 						</svg>
-						<h3 class="mt-4 text-xl font-semibold text-white">Backend Development</h3>
-						<p class="mt-2 text-center text-gray-400">
+						<h3 class="mt-3 text-lg font-semibold text-white sm:text-xl">Backend Development</h3>
+						<p class="mt-2 text-center text-sm text-gray-400 sm:text-base">
 							Building robust and scalable server-side applications to support front-end
 							functionalities.
 						</p>
 					</div>
+
+					<!-- Repeat as necessary for more cards -->
 
 					<!-- Skill Card 4 -->
 					<div
@@ -372,7 +375,7 @@
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-12 w-12 text-[#ff4d4d]"
+							class="h-10 w-10 text-[#ff4d4d] sm:h-12 sm:w-12"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -390,49 +393,19 @@
 								d="M12 2v4m0 16v4m10-10h-4M6 12H2"
 							/>
 						</svg>
-						<h3 class="mt-4 text-xl font-semibold text-white">Problem Solving</h3>
-						<p class="mt-2 text-center text-gray-400">
+						<h3 class="mt-3 text-lg font-semibold text-white sm:text-xl">Problem Solving</h3>
+						<p class="mt-2 text-center text-sm text-gray-400 sm:text-base">
 							Delivering creative solutions to complex challenges with a focus on efficiency and
 							performance.
-						</p>
-					</div>
-
-					<!-- Skill Card 5 -->
-					<div
-						class="flex flex-col items-center justify-center rounded-lg bg-gray-800 p-6 shadow-md transition-shadow duration-300 hover:shadow-xl"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-12 w-12 text-[#ff4d4d]"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 8c1.104 0 2 .896 2 2s-.896 2-2 2-2-.896-2-2 .896-2 2-2zm0 10c2.21 0 4-1.79 4-4H8c0 2.21 1.79 4 4 4z"
-							/>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 2v4m0 16v4m10-10h-4M6 12H2"
-							/>
-						</svg>
-						<h3 class="mt-4 text-xl font-semibold text-white">Team Collaboration</h3>
-						<p class="mt-2 text-center text-gray-400">
-							Working effectively within diverse teams to deliver high-quality software solutions.
 						</p>
 					</div>
 				</div>
 
 				<!-- Contact Button -->
-				<div class="col-start-2 col-end-12 text-center lg:col-start-3 lg:col-end-11">
+				<div class="col-span-12 text-center">
 					<a
 						href="#contact"
-						class="inline-block transform rounded-lg bg-[#ff4d4d] px-10 py-4 text-lg font-medium text-white shadow-lg transition-transform hover:scale-105 hover:bg-[#e63939]"
+						class="inline-block transform rounded-lg bg-[#ff4d4d] px-8 py-3 text-base font-medium text-white shadow-lg transition-transform hover:scale-105 hover:bg-[#e63939] sm:px-10 sm:py-4 sm:text-lg"
 					>
 						Contact Me
 					</a>
@@ -545,5 +518,38 @@
 		.xl\:col-span-8 {
 			grid-column: span 8 / span 8;
 		}
+	}
+
+	@media (max-width: 640px) {
+		/* Reduce padding and margins for smaller screens */
+		#about {
+			padding: 2rem 1rem;
+		}
+		h1 {
+			font-size: 2.5rem; /* Adjust heading size */
+		}
+		p {
+			font-size: 1rem; /* Adjust paragraph size */
+		}
+		.skill-card {
+			padding: 1rem;
+		}
+		button {
+			padding: 0.75rem 1.5rem;
+			font-size: 1rem;
+		}
+	}
+
+	/* Gridlines Animation */
+	@keyframes gridlines {
+		0% {
+			background-position: 0 0;
+		}
+		100% {
+			background-position: 40px 40px;
+		}
+	}
+	.animate-gridlines {
+		animation: gridlines 10s linear infinite;
 	}
 </style>
