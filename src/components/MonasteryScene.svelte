@@ -149,8 +149,8 @@
 					uniforms: {
 						uTime: { value: 0 },
 						uRevealHeight: { value: 0 },
-						uBaseColor: { value: new THREE.Color(0xffffff) },
-						uAccentColor: { value: new THREE.Color(0xdc143c) }
+						uBaseColor: { value: new THREE.Color(0x800020) }, // Deep sky blue
+						uAccentColor: { value: new THREE.Color(0xff4500) } // Orange red
 					},
 					transparent: true,
 					wireframe: true
