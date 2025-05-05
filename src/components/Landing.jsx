@@ -1,9 +1,8 @@
 // Landing.jsx
 import React, {Suspense, useState, useRef, useEffect} from "react";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import Grass from "./grass/Grass.jsx";
-import { Perf } from "r3f-perf";
 import {Html, Sky, useProgress} from "@react-three/drei";
 import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
@@ -175,7 +174,7 @@ export default function Landing() {
                     <Butterflies count={50} width={100} />
                     <Grass />
                     <EffectComposer>
-                        <Noise opacity={0.7} blendFunction={BlendFunction.OVERLAY} />
+                        <Noise opacity={0.5} blendFunction={BlendFunction.OVERLAY} />
                         <Vignette eskil={false} offset={0.03} darkness={0.6} />
                     </EffectComposer>
                 </Suspense>
