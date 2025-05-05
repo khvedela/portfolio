@@ -1,10 +1,10 @@
 // Landing.jsx
-import React, { Suspense, useState, useRef } from "react";
+import React, {Suspense, useState, useRef, useEffect} from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Grass from "./grass/Grass.jsx";
 import { Perf } from "r3f-perf";
-import { Sky } from "@react-three/drei";
+import {Html, Sky, useProgress} from "@react-three/drei";
 import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
 import gsap from "gsap";
@@ -13,42 +13,80 @@ import Navigation from "./Navigation.jsx";
 
 function CameraRotator({ active, initialQuat, targetQuat }) {
     const { camera } = useThree();
-    const animating = useRef(false);
+    const timeline = useRef(null);
 
-    React.useEffect(() => {
-        if (active && !animating.current) {
-            animating.current = true;
-
-            // Create an object to animate
-            const dummy = { t: 0 };
-
-            gsap.to(dummy, {
-                t: 1,
-                duration: 2, // Animation duration in seconds
-                ease: "power2.inOut", // Smooth easing function
-                onUpdate: () => {
-                    camera.quaternion.slerpQuaternions(
-                        initialQuat,
-                        targetQuat,
-                        dummy.t
-                    );
-                },
+    useEffect(() => {
+        if (active) {
+            // Create a new GSAP timeline
+            timeline.current = gsap.timeline({
                 onComplete: () => {
-                    animating.current = false;
+                    camera.quaternion.copy(targetQuat);
                 }
             });
+
+            // Store initial quaternion values
+            const initialRotation = {
+                _x: camera.quaternion.x,
+                _y: camera.quaternion.y,
+                _z: camera.quaternion.z,
+                _w: camera.quaternion.w
+            };
+
+            // Target quaternion values
+            const targetRotation = {
+                _x: targetQuat.x,
+                _y: targetQuat.y,
+                _z: targetQuat.z,
+                _w: targetQuat.w
+            };
+
+            // Animate the quaternion values
+            timeline.current.to(initialRotation, {
+                duration: 2.5,
+                _x: targetRotation._x,
+                _y: targetRotation._y,
+                _z: targetRotation._z,
+                _w: targetRotation._w,
+                ease: "power2.inOut",
+                onUpdate: () => {
+                    camera.quaternion.set(
+                        initialRotation._x,
+                        initialRotation._y,
+                        initialRotation._z,
+                        initialRotation._w
+                    );
+                }
+            });
+        } else {
+            // Kill the animation if active becomes false
+            if (timeline.current) {
+                timeline.current.kill();
+            }
+            camera.quaternion.copy(initialQuat);
         }
+
+        return () => {
+            if (timeline.current) {
+                timeline.current.kill();
+            }
+        };
     }, [active, camera, initialQuat, targetQuat]);
 
     return null;
 }
 
 
+
 export default function Landing() {
     const [entered, setEntered] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
     const buttonRef = useRef(null);
     const initialQuat = useRef(new THREE.Quaternion());
     const targetQuat  = useRef(new THREE.Quaternion());
+
+    const audioRef = useRef(new Audio('/ambient_sound.mp3'));
+    const [audioInitialized, setAudioInitialized] = useState(false);
+
 
     const handleCreated = ({ camera }) => {
         // 1) look straight up
@@ -61,10 +99,35 @@ export default function Landing() {
         camera.quaternion.copy(initialQuat.current);
     };
 
+    useEffect(() => {
+        const audio = audioRef.current;
+        audio.loop = true;
+
+        return () => {
+            audio.pause();
+            audio.currentTime = 0;
+        };
+    }, []);
+
+
+    const handleEnter = () => {
+        if (!audioInitialized) {
+            audioRef.current.play()
+                .then(() => {
+                    setAudioInitialized(true);
+                })
+                .catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+        }
+        setEntered(true);
+    };
+
+
     return (
         <div style={{width:'100%', height:'100%'}}>
             {entered && <Navigation />}
-            {!entered && (
+            {!entered && isLoaded && (
                 <div
                     style={{
                         position: "absolute",
@@ -76,7 +139,7 @@ export default function Landing() {
                 >
                     <button
                         ref={buttonRef}
-                        onClick={() => setEntered(true)}
+                        onClick={handleEnter}
                         style={{
                             fontSize: "1.8rem",
                             fontFamily: "Courgette",
@@ -95,7 +158,7 @@ export default function Landing() {
 
             <Canvas
                 onCreated={handleCreated}
-                camera={{ position: [0, 10, 30], fov: 60 }}
+                camera={{ position: [0, 15, 50], fov: 60 }}
             >
                 <CameraRotator
                     active={entered}
@@ -108,8 +171,8 @@ export default function Landing() {
                 <ambientLight />
                 <pointLight position={[10, 10, 10]} />
 
-                <Suspense fallback={null}>
-                    <Butterflies count={150} width={100} />
+                <Suspense fallback={<Loader onLoad={() => setIsLoaded(true)} />}>
+                    <Butterflies count={50} width={100} />
                     <Grass />
                     <EffectComposer>
                         <Noise opacity={0.7} blendFunction={BlendFunction.OVERLAY} />
@@ -120,3 +183,20 @@ export default function Landing() {
         </div>
     );
 }
+
+function Loader({ onLoad }) {
+    const { progress } = useProgress();
+
+    React.useEffect(() => {
+        if (progress === 100) {
+            onLoad();
+        }
+    }, [progress, onLoad]);
+
+    return (
+        <Html center style={{ color: "white", fontSize: "1.2rem" }}>
+            {Math.floor(progress)}% loading…
+        </Html>
+    );
+}
+

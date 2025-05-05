@@ -8,16 +8,27 @@ import EducationSection from './EducationSection';
 import { cvData } from './cvData';
 import gsap from 'gsap';
 
+const ANIMATION_DURATION = 0.8;
+
 export default function CV({ isOpen, onClose }) {
     const containerRef = useRef(null);
+    const isMobile = window.innerWidth <= 768;
 
     useEffect(() => {
         if (containerRef.current) {
-            gsap.to(containerRef.current, {
-                width: isOpen ? '600px' : '0',
-                duration: 1.1,
-                ease: "power2.inOut"
-            });
+            if (isMobile) {
+                gsap.to(containerRef.current, {
+                    marginRight: isOpen ? '0' : '-100%',
+                    duration: ANIMATION_DURATION,
+                    ease: "power2.inOut"
+                });
+            } else {
+                gsap.to(containerRef.current, {
+                    marginRight: isOpen ? '0' : '-600px',
+                    duration: ANIMATION_DURATION,
+                    ease: "power2.inOut"
+                });
+            }
         }
     }, [isOpen]);
 
@@ -30,12 +41,13 @@ export default function CV({ isOpen, onClose }) {
                 right: 0,
                 top: 0,
                 height: '100vh',
-                width: '0',
+                marginRight: isMobile ? '-100%' : '-600px',
+                width: isMobile ? '100%' : '600px',
                 backgroundColor: 'white',
                 pointerEvents: 'auto',
                 overflow: 'hidden',
-                fontFamily: 'arial, sans-serif'
-
+                fontFamily: 'Inter',
+                fontSize: '0.875rem',
             }}
         >
             <CvHeader name={cvData.name} title={cvData.title} onClose={onClose} />
