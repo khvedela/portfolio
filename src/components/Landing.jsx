@@ -9,6 +9,7 @@ import { BlendFunction } from "postprocessing";
 import gsap from "gsap";
 import Butterflies from "./Butterfly.jsx";
 import Navigation from "./Navigation.jsx";
+import Balloons from "./Baloons.jsx";
 
 function CameraRotator({ active, initialQuat, targetQuat }) {
     const { camera } = useThree();
@@ -172,6 +173,7 @@ export default function Landing() {
 
                 <Suspense fallback={<Loader onLoad={() => setIsLoaded(true)} />}>
                     <Butterflies count={50} width={100} />
+                    <Balloons />
                     <Grass />
                     <EffectComposer>
                         <Noise opacity={0.5} blendFunction={BlendFunction.OVERLAY} />
