@@ -189,17 +189,17 @@ interface GeometryTopologyProps {
 export default function GeometryTopology({
   animateIn = false,
 }: GeometryTopologyProps) {
-  const materialRef = useRef();
+  const materialRef = useRef({} as any);
   const mouseRef = useRef({ x: 0, y: 0, down: false, intensity: 1.0 });
   const { size, gl, viewport } = useThree();
-  const meshRef = useRef(null);
+  const meshRef = useRef(null as any);
 
   // Mouse interaction setup
   useEffect(() => {
     const canvas = gl.domElement;
 
     // Mouse move handler
-    const handleMouseMove = (event) => {
+    const handleMouseMove = (event: any) => {
       const rect = canvas.getBoundingClientRect();
       mouseRef.current.x = (event.clientX - rect.left) / rect.width;
       mouseRef.current.y = 1.0 - (event.clientY - rect.top) / rect.height; // Flip Y
@@ -214,7 +214,7 @@ export default function GeometryTopology({
     };
 
     // Touch handlers for mobile
-    const handleTouchMove = (event) => {
+    const handleTouchMove = (event: any) => {
       if (event.touches.length > 0) {
         const rect = canvas.getBoundingClientRect();
         mouseRef.current.x =
@@ -256,7 +256,7 @@ export default function GeometryTopology({
 
   // Add keyboard controls for intensity
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: any) => {
       if (e.key === "+" || e.key === "=") {
         mouseRef.current.intensity = Math.min(
           mouseRef.current.intensity + 0.1,

@@ -1,12 +1,14 @@
 "use client";
 
+export const runtime = "edge";
+
 import { Canvas } from "@react-three/fiber";
 import GeometryTopology from "@/components/GeometryTopology";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
 export default function Home() {
-  const textRef = useRef(null);
+  const textRef = useRef({} as any);
   const canvasContainerRef = useRef(null);
 
   useEffect(() => {

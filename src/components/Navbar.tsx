@@ -45,15 +45,25 @@ interface NavLinkProps {
   isDisabled?: boolean;
 }
 
-function NavLink({ label, href, index, refs, animate, isActive, isDisabled }: NavLinkProps) {
+function NavLink({
+  label,
+  href,
+  index,
+  refs,
+  animate,
+  isActive,
+  isDisabled,
+}: NavLinkProps) {
   const handleEnter = useCallback(() => {
     if (!isDisabled) animate(index);
   }, [animate, index, isDisabled]);
 
   return (
-    <li 
-      className={`overflow-hidden ${isDisabled ? 'opacity-40 cursor-not-allowed' : ''}`} 
-      role="menuitem" 
+    <li
+      className={`overflow-hidden ${
+        isDisabled ? "opacity-40 cursor-not-allowed" : ""
+      }`}
+      role="menuitem"
       onMouseEnter={handleEnter}
     >
       {isDisabled ? (
@@ -62,7 +72,9 @@ function NavLink({ label, href, index, refs, animate, isActive, isDisabled }: Na
             ref={(el) => {
               refs.current[index] = el;
             }}
-            className={`inline-block ${isActive ? 'text-yellow-300 font-medium' : ''}`}
+            className={`inline-block ${
+              isActive ? "text-yellow-300 font-medium" : ""
+            }`}
           >
             {label}
           </span>
@@ -73,7 +85,9 @@ function NavLink({ label, href, index, refs, animate, isActive, isDisabled }: Na
             ref={(el) => {
               refs.current[index] = el;
             }}
-            className={`inline-block ${isActive ? 'text-yellow-300 font-medium' : ''}`}
+            className={`inline-block ${
+              isActive ? "text-yellow-300 font-medium" : ""
+            }`}
           >
             {label}
           </span>
@@ -92,10 +106,10 @@ export default function Navbar() {
     { label: "Resource", href: "/resource", implemented: false },
   ];
   const { refs, animate } = useSlideAnimation<HTMLSpanElement>();
-  
+
   // Get current path to determine active link
-  const [currentPath, setCurrentPath] = useState('');
-  
+  const [currentPath, setCurrentPath] = useState("");
+
   useEffect(() => {
     setCurrentPath(window.location.pathname);
   }, []);
@@ -314,7 +328,9 @@ export default function Navbar() {
       </ul>
 
       {/* Mobile Navigation Button */}
-      <div className="md:hidden flex justify-between items-center bg-[#111] px-4 py-2 rounded-full mt-3 max-w-xs mx-auto"> {/* Added max-width and mx-auto */}
+      <div className="md:hidden flex justify-between items-center bg-[#111] px-4 py-2 rounded-full mt-3 max-w-xs mx-auto">
+        {" "}
+        {/* Added max-width and mx-auto */}
         <button
           onClick={toggleMobileMenu}
           className="text-white focus:outline-none"
@@ -345,7 +361,6 @@ export default function Navbar() {
             )}
           </svg>
         </button>
-
         <li
           role="menuitem"
           className="list-none overflow-hidden bg-white rounded-full px-2 py-1 text-xs"
@@ -394,7 +409,14 @@ export default function Navbar() {
         style={{ height: 0, opacity: 0 }}
       >
         {navItems.map((item, i) => (
-          <li key={item.label} className={`py-2 text-center ${!item.implemented ? 'opacity-40 cursor-not-allowed' : ''} ${currentPath === item.href ? 'text-yellow-300 font-medium' : ''}`}>
+          <li
+            key={item.label}
+            className={`py-2 text-center ${
+              !item.implemented ? "opacity-40 cursor-not-allowed" : ""
+            } ${
+              currentPath === item.href ? "text-yellow-300 font-medium" : ""
+            }`}
+          >
             {item.implemented ? (
               <Link href={item.href} className="block focus:outline-none">
                 {item.label}
