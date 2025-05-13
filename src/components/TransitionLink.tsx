@@ -10,7 +10,6 @@ export default function TransitionLink({
   href,
   children,
   className,
-  delay = 0.5,
 }: {
   href: string;
   children: React.ReactNode;

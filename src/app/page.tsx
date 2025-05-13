@@ -1,4 +1,3 @@
-import Image from "next/image";
 import ProjectShowcase from "../components/ProjectShowcase";
 
 export const runtime = "edge";

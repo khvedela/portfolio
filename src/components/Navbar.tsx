@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import TransitionLink from "./TransitionLink";
 
@@ -59,12 +58,6 @@ function NavLink({
   const handleEnter = useCallback(() => {
     if (!isDisabled) animate(index);
   }, [animate, index, isDisabled]);
-
-  const closeMenu = useCallback(() => {
-    // This function will be passed down from the Navbar component
-    // to close the mobile menu when a link is clicked
-    document.dispatchEvent(new CustomEvent("closeMobileMenu"));
-  }, []);
 
   return (
     <li
@@ -177,28 +170,69 @@ export default function Navbar() {
   const handleEmailClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
-      navigator.clipboard.writeText(originalEmail);
+      const copyText = originalEmail;
       const el = emailSpanRef.current;
-      if (!el) return;
-      import("gsap").then(({ gsap }) => {
-        gsap.killTweensOf(el);
-        const tl = gsap.timeline();
-        tl.to(el, { yPercent: -100, duration: 0.4, ease: "power2.out" })
-          .add(() => setEmailLabel("Copied"))
-          .fromTo(
-            el,
-            { yPercent: 100 },
-            { yPercent: 0, duration: 0.4, ease: "power2.out" }
-          )
-          .addPause("+=1.5")
-          .to(el, { yPercent: -100, duration: 0.4, ease: "power2.out" })
-          .add(() => setEmailLabel(originalEmail))
-          .fromTo(
-            el,
-            { yPercent: 100 },
-            { yPercent: 0, duration: 0.4, ease: "power2.out" }
-          );
-      });
+      // Clipboard API check
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+      ) {
+        navigator.clipboard.writeText(copyText);
+        if (!el) return;
+        import("gsap").then(({ gsap }) => {
+          gsap.killTweensOf(el);
+          const tl = gsap.timeline();
+          tl.to(el, { yPercent: -100, duration: 0.4, ease: "power2.out" })
+            .add(() => setEmailLabel("Copied"))
+            .fromTo(
+              el,
+              { yPercent: 100 },
+              { yPercent: 0, duration: 0.4, ease: "power2.out" }
+            )
+            .addPause("+=1.5")
+            .to(el, { yPercent: -100, duration: 0.4, ease: "power2.out" })
+            .add(() => setEmailLabel(originalEmail))
+            .fromTo(
+              el,
+              { yPercent: 100 },
+              { yPercent: 0, duration: 0.4, ease: "power2.out" }
+            );
+        });
+      } else {
+        // Fallback for unsupported browsers
+        try {
+          const tempInput = document.createElement("input");
+          tempInput.value = copyText;
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand("copy");
+          document.body.removeChild(tempInput);
+          if (el) {
+            import("gsap").then(({ gsap }) => {
+              gsap.killTweensOf(el);
+              const tl = gsap.timeline();
+              tl.to(el, { yPercent: -100, duration: 0.4, ease: "power2.out" })
+                .add(() => setEmailLabel("Copied"))
+                .fromTo(
+                  el,
+                  { yPercent: 100 },
+                  { yPercent: 0, duration: 0.4, ease: "power2.out" }
+                )
+                .addPause("+=1.5")
+                .to(el, { yPercent: -100, duration: 0.4, ease: "power2.out" })
+                .add(() => setEmailLabel(originalEmail))
+                .fromTo(
+                  el,
+                  { yPercent: 100 },
+                  { yPercent: 0, duration: 0.4, ease: "power2.out" }
+                );
+            });
+          }
+        } catch {
+          setEmailLabel("Copy not supported");
+          setTimeout(() => setEmailLabel(originalEmail), 2000);
+        }
+      }
     },
     [originalEmail]
   );
@@ -280,6 +314,10 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   const toggleMobileMenu = useCallback(() => {
     setMobileMenuOpen((prev) => !prev);
   }, []);
@@ -314,10 +352,11 @@ export default function Navbar() {
           onMouseEnter={handleEmailMouseEnter}
           onMouseLeave={handleEmailMouseLeave}
         >
-          <a
-            href="#"
+          <button
+            type="button"
             onClick={handleEmailClick}
-            className="block focus:outline-none text-[#111]"
+            className="block focus:outline-none text-[#111] w-full"
+            style={{ background: "none", border: 0, padding: 0, margin: 0 }}
           >
             <span
               ref={(el) => {
@@ -329,7 +368,7 @@ export default function Navbar() {
               {emailLabel === "Copied" && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-green-500"
+                  className="h-4 w-4 text-green-500 align-middle self-center"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -343,7 +382,7 @@ export default function Navbar() {
                 </svg>
               )}
             </span>
-          </a>
+          </button>
         </li>
       </ul>
 
@@ -387,10 +426,11 @@ export default function Navbar() {
           onMouseEnter={handleEmailMouseEnter}
           onMouseLeave={handleEmailMouseLeave}
         >
-          <a
-            href="#"
+          <button
+            type="button"
             onClick={handleEmailClick}
-            className="block focus:outline-none text-[#111]"
+            className="block focus:outline-none text-[#111] w-full"
+            style={{ background: "none", border: 0, padding: 0, margin: 0 }}
           >
             <span
               ref={(el) => {
@@ -402,9 +442,9 @@ export default function Navbar() {
               {emailLabel === "Copied" && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-green-500"
+                  className="h-4 w-4 text-green-500 align-middle self-center"
                   fill="none"
-                  viewBox="0 24 24"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
                   <path
@@ -416,7 +456,7 @@ export default function Navbar() {
                 </svg>
               )}
             </span>
-          </a>
+          </button>
         </li>
       </div>
 
@@ -431,7 +471,7 @@ export default function Navbar() {
           opacity: mobileMenuOpen ? 1 : 0,
         }}
       >
-        {navItems.map((item, i) => (
+        {navItems.map((item) => (
           <li
             key={item.label}
             className={`py-2 text-center ${

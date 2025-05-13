@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useRef } from "react";
-import gsap from "gsap";
 
 export const runtime = "edge";
 
@@ -31,15 +30,16 @@ export default function AboutPage() {
             David Khvedelidze
           </h2>
           <p className="mb-4 animate-item">
-            Hi there! I'm a Front-End Developer with 5+ years of experience
+            Hi there! I&apos;m a Front-End Developer with 5+ years of experience
             creating dynamic, responsive web applications. I specialize in
             React/Next.js development with a focus on performance optimization
             and modern UI implementations.
           </p>
           <p className="mb-4 animate-item">
-            I'm passionate about creating intuitive user experiences with clean,
-            maintainable code. My expertise includes component architecture,
-            state management, and working with complex data visualization.
+            I&apos;m passionate about creating intuitive user experiences with
+            clean, maintainable code. My expertise includes component
+            architecture, state management, and working with complex data
+            visualization.
           </p>
 
           <div className="mt-4 animate-item">
@@ -58,7 +58,7 @@ export default function AboutPage() {
                 "Responsive Design",
                 "REST APIs",
                 "Git/GitHub",
-              ].map((skill, index) => (
+              ].map((skill) => (
                 <span
                   key={skill}
                   className="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full text-sm skill-tag"
@@ -107,7 +107,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold mb-4 animate-item">Education</h2>
         <div className="border-l-4 border-gray-300 pl-4 animate-item">
           <h3 className="text-xl font-medium">
-            Bachelor's in Computer Science
+            Bachelor&apos;s in Computer Science
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
             San Jose State University • 2014 - 2018

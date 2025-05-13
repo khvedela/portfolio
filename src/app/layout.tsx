@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import Footer from "../components/Footer";
 import PageTransition from "@/components/PageTransition";
 
 const geistSans = Geist({
@@ -57,7 +56,6 @@ export default function RootLayout({
           id="global-page-transition-overlay"
           className="page-transition-overlay"
         ></div>
-        {/* <Footer /> */}
       </body>
     </html>
   );
