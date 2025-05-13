@@ -98,11 +98,6 @@ const TriangleGridContourMaterial = shaderMaterial(
      col=mix(col, vec3(0),(1.-smoothstep(0.,sf*0.5,d3)));
      col=mix(col, vec3(0),(1.-smoothstep(0.,sf*0.7,d4)));
      col=mix(col, vec3(1),(1.-smoothstep(0.,sf*0.6,d4+.005)));
-     vec2 q=oP*1.5; col=min(col,1.);
-     float gr=sqrt(dot(col,vec3(.299,.587,.114)))*1.25;
-     float ns=(n2D3G(q*4.*vec2(1./3.,3))*.64+n2D3G(q*8.*vec2(1./3.,3))*.34)*.5+.5; ns=gr-ns;
-     q*=rot2(3.14159/3.); float ns2=(n2D3G(q*4.*vec2(1./3.,3))*.64+n2D3G(q*8.*vec2(1./3.,3))*.34)*.5+.5; ns2=gr-ns2;
-     ns=smoothstep(0.,1.,min(ns,ns2)); col=mix(col,col*(ns+.35),.4);
      vec2 uv=vUv* iResolution.xy;
      
      // Calculate distance to mouse position (in shader space)
@@ -138,19 +133,19 @@ const TriangleGridContourMaterial = shaderMaterial(
      
      // Enhanced reveal effect with wave pattern
      float revealProgress = iReveal;
-     float waveAmplitude = 0.05 * (1.0 - revealProgress); // Wave amplitude reduces as animation completes
+     float waveAmplitude = 0.02 * (1.0 - revealProgress); // Reduced wave amplitude for smoother edge
      float waveFreq = 15.0;
      float waveFront = revealProgress + waveAmplitude * sin(vUv.y * waveFreq + iTime * 10.0);
      
-     // Early discard for reveal animation with wavy edge - use WHITE background
+     // Early discard for reveal animation with wavy edge - use transparent background
      if (vUv.x > waveFront) {
-       gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // White background
+       gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); // Transparent background
        return;
      }
      
-     // Apply enhanced reveal edge effect with dynamic glow
-     float revealEdge = smoothstep(waveFront - 0.1, waveFront, vUv.x);
-     float pulseEffect = sin(iTime * 6.0) * 0.5 + 0.5;
+     // No reveal edge effect - we've removed the glow
+     float revealEdge = 0.0;
+     float pulseEffect = 0.0; // Not used anymore
      
      // Apply mouse panning when mouse is dragged
      vec2 mouseOffset = vec2(0.0);
@@ -170,9 +165,9 @@ const TriangleGridContourMaterial = shaderMaterial(
      vec2 screenUv = fragCoord / iResolution.xy;
      col *= pow(16.0*screenUv.x*screenUv.y*(1.0-screenUv.x)*(1.0-screenUv.y), 0.03) + 0.1;
      
-     // Enhanced highlight at reveal edge with pulse
-     vec3 edgeColor = mix(vec3(1.0, 0.9, 0.7), vec3(1.0, 0.7, 0.4), pulseEffect);
-     col = mix(col, edgeColor * 2.0, revealEdge * 0.6);
+     // Enhanced highlight at reveal edge with pulse - removed for cleaner animation
+     // vec3 edgeColor = mix(vec3(1.0, 0.9, 0.7), vec3(1.0, 0.7, 0.4), pulseEffect);
+     // col = mix(col, edgeColor * 2.0, revealEdge * 0.6);
      
      // Add subtle color shift based on reveal progress
      col = mix(col, col * vec3(0.9, 1.0, 1.1), (1.0 - revealProgress) * 0.3);
@@ -326,10 +321,16 @@ export default function GeometryTopology({
         materialRef.current,
         {
           iReveal: 1.0,
-          duration: 1.5,
-          ease: "power1.inOut",
+          duration: 1.2, // Slightly faster animation
+          ease: "power1.out", // Changed to a simpler easing
+          onComplete: () => {
+            // Force a full reveal without edge glow after animation completes
+            if (materialRef.current) {
+              materialRef.current.iReveal = 1.01;
+            }
+          },
         },
-        "-=1.2"
+        "-=1.0"
       ); // More overlap to speed up the animation
 
       // Animate scale and rotation slightly after reveal starts
@@ -371,9 +372,19 @@ export default function GeometryTopology({
   });
 
   return (
-    <mesh ref={meshRef}>
-      <planeGeometry args={[2, 2, 1, 1]} />
-      <triangleGridContourMaterial ref={materialRef} />
+    <mesh ref={meshRef} scale={[1, innerHeight / innerWidth, 1]}>
+      <planeGeometry args={[2, 2]} />
+      <triangleGridContourMaterial
+        ref={materialRef}
+        transparent={true}
+        iResolution={
+          new THREE.Vector2(
+            innerWidth * viewport.dpr,
+            innerHeight * viewport.dpr
+          )
+        }
+        iAspect={innerWidth / innerHeight}
+      />
     </mesh>
   );
 }

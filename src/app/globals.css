@@ -1,9 +1,131 @@
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+html,
 body {
   font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  min-height: 100vh;
+  /* Adjust for the safe area on mobile devices */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  /* Smooth scrolling for animations */
+  scroll-behavior: smooth;
+  /* Prevent content shifting during page transitions */
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure proper page structure */
+#__next {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  flex: 1 0 auto;
+}
+
+/* Home page name styling with text shadow for better visibility */
+.letter {
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Canvas and text positioning for home page */
+.home-canvas {
+  position: relative;
+  z-index: 0;
+}
+
+.home-text {
+  position: relative;
+  z-index: 2;
 }
 
 .perspective-500 {
   perspective: 500px;
+}
+
+/* Add safe area utilities */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+}
+
+/* Page transition animation classes */
+.page-transition-container {
+  position: relative;
+  min-height: 50vh;
+  will-change: transform, opacity;
+  width: 100%;
+  z-index: 1; /* Ensure this is below the overlay z-index */
+}
+
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  z-index: 9999;
+  pointer-events: none;
+  /* Ensure overlay stays on top of everything */
+  isolation: isolate;
+}
+
+/* Animation utility classes */
+.animate-item {
+  will-change: transform, opacity;
+  transform: translateY(0); /* Ensure elements have a base transform */
+}
+
+.parallax {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.scroll-animate,
+.scroll-stagger-item {
+  will-change: transform, opacity;
+  opacity: 0; /* Start invisible */
+  transform: translateY(0); /* Ensure elements have a base transform */
+}
+
+/* Hover effect for project cards */
+.project-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }

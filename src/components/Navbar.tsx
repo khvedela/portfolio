@@ -2,6 +2,8 @@
 
 import { useRef, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import TransitionLink from "./TransitionLink";
 
 function useSlideAnimation<T extends HTMLElement>() {
   const refs = useRef<(T | null)[]>([]);
@@ -58,6 +60,12 @@ function NavLink({
     if (!isDisabled) animate(index);
   }, [animate, index, isDisabled]);
 
+  const closeMenu = useCallback(() => {
+    // This function will be passed down from the Navbar component
+    // to close the mobile menu when a link is clicked
+    document.dispatchEvent(new CustomEvent("closeMobileMenu"));
+  }, []);
+
   return (
     <li
       className={`overflow-hidden ${
@@ -80,7 +88,7 @@ function NavLink({
           </span>
         </span>
       ) : (
-        <Link href={href} className="block focus:outline-none">
+        <TransitionLink href={href} className="block focus:outline-none">
           <span
             ref={(el) => {
               refs.current[index] = el;
@@ -91,7 +99,7 @@ function NavLink({
           >
             {label}
           </span>
-        </Link>
+        </TransitionLink>
       )}
     </li>
   );
@@ -100,19 +108,20 @@ function NavLink({
 export default function Navbar() {
   const navItems: { label: string; href: string; implemented: boolean }[] = [
     { label: "Home", href: "/home", implemented: true },
-    { label: "Work", href: "/work", implemented: false },
-    { label: "About", href: "/about", implemented: false },
+    { label: "Work", href: "/work", implemented: true },
+    { label: "About", href: "/about", implemented: true },
     { label: "Playground", href: "/playground", implemented: false },
     { label: "Resource", href: "/resource", implemented: false },
   ];
   const { refs, animate } = useSlideAnimation<HTMLSpanElement>();
 
   // Get current path to determine active link
-  const [currentPath, setCurrentPath] = useState("");
+  const pathname = usePathname();
+  const [currentPath, setCurrentPath] = useState(pathname);
 
   useEffect(() => {
-    setCurrentPath(window.location.pathname);
-  }, []);
+    setCurrentPath(pathname);
+  }, [pathname]);
 
   const originalEmail = "davidkhvedelidze@gmail.com";
   const copyLabel = "copy email";
@@ -261,6 +270,16 @@ export default function Navbar() {
     });
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    // Set up event listener for closing mobile menu
+    const handleCloseMobileMenu = () => setMobileMenuOpen(false);
+    document.addEventListener("closeMobileMenu", handleCloseMobileMenu);
+
+    return () => {
+      document.removeEventListener("closeMobileMenu", handleCloseMobileMenu);
+    };
+  }, []);
+
   const toggleMobileMenu = useCallback(() => {
     setMobileMenuOpen((prev) => !prev);
   }, []);
@@ -269,11 +288,12 @@ export default function Navbar() {
     <nav
       ref={navRef}
       aria-label="Main Navigation"
-      className="m-auto w-full px-4 sm:w-11/12 md:w-4/5 lg:w-3/4 xl:w-1/2" // Reduced width from 2/3 to 1/2
+      className="mx-auto w-full px-4 sm:w-11/12 md:w-4/5 lg:w-3/4 xl:w-1/2" // Reduced width from 2/3 to 1/2
     >
       {/* Desktop Navigation */}
       <ul
         role="menubar"
+        aria-label="Primary Navigation"
         className="text-white hidden md:flex items-center justify-between bg-[#111] px-3 sm:px-6 py-2 rounded-full mt-3 max-w-3xl mx-auto" // Added max-width constraint and mx-auto
       >
         {navItems.map((item, i) => (
@@ -400,13 +420,16 @@ export default function Navbar() {
         </li>
       </div>
 
-      {/* Mobile Menu Dropdown - Added ref and always render it for animation */}
+      {/* Mobile Menu Dropdown */}
       <ul
         ref={mobileMenuRef}
         className={`md:hidden bg-[#111] mt-2 rounded-xl p-4 text-white overflow-hidden max-w-xs mx-auto ${
-          !mobileMenuOpen ? "h-0 p-0" : ""
+          !mobileMenuOpen ? "h-0 p-0 absolute -z-10" : ""
         }`}
-        style={{ height: 0, opacity: 0 }}
+        style={{
+          height: mobileMenuOpen ? "auto" : 0,
+          opacity: mobileMenuOpen ? 1 : 0,
+        }}
       >
         {navItems.map((item, i) => (
           <li
@@ -418,9 +441,12 @@ export default function Navbar() {
             }`}
           >
             {item.implemented ? (
-              <Link href={item.href} className="block focus:outline-none">
+              <TransitionLink
+                href={item.href}
+                className="block focus:outline-none"
+              >
                 {item.label}
-              </Link>
+              </TransitionLink>
             ) : (
               <span className="block">{item.label}</span>
             )}

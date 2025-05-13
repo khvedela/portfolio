@@ -27,6 +27,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-glsl": "^1.0.0",
+    "eslint": "9.26.0",
+    "eslint-config-next": "15.3.2",
     "glslify": "^7.1.1",
     "raw-loader": "^4.0.2",
     "tailwindcss": "^4",
