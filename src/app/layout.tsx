@@ -40,14 +40,33 @@ export default function RootLayout({
           name="keywords"
           content="David Khvedelidze, portfolio, web development, projects"
         />
-        {/* No need for inline styles as they're defined in globals.css */}
+        {/* Analytics script placeholder (Google Analytics example) */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-B08ZZQSMNR"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-B08ZZQSMNR');
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        role="document"
       >
         <Navbar />
         <PageTransition>
-          <main className="px-8 pt-5 pb-safe flex-grow relative">
+          <main
+            className="px-8 pt-5 pb-safe flex-grow relative"
+            role="main"
+            tabIndex={-1}
+          >
             {children}
           </main>
         </PageTransition>
@@ -55,6 +74,7 @@ export default function RootLayout({
         <div
           id="global-page-transition-overlay"
           className="page-transition-overlay"
+          aria-hidden="true"
         ></div>
       </body>
     </html>
