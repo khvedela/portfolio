@@ -1,0 +1,325 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Editorial-inspired design system for portfolio
+All colors MUST be HSL.
+*/
+
+@layer base {
+:root {
+    /* Pure minimalist palette */
+    --background: 0 0% 99%;
+    --foreground: 0 0% 8%;
+
+    /* Card system */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    /* Modern blue accent system */
+    --primary: 220 100% 50%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 220 100% 65%;
+
+    /* Neutral grays - improved contrast */
+    --secondary: 224 15% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 224 76% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    /* System colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 224 76% 48%;
+
+    --radius: 0.75rem;
+
+    /* Typography scales */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Responsive spacing system */
+    --section-padding-mobile: 3rem 0;
+    --section-padding-tablet: 4rem 0;
+    --section-padding: 6rem 0;
+    --container-padding: 0 1rem;
+    --container-padding-sm: 0 1.5rem;
+    --container-padding-lg: 0 2rem;
+    --max-width: 1200px;
+
+    /* Animation system */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Advanced Animation Variables */
+    --stagger-delay: 0.1s;
+    --parallax-speed: 0.5;
+    --hover-scale: 1.05;
+    --micro-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Shadows */
+    --shadow-subtle: 0 1px 3px 0 hsl(0 0% 0% / 0.1);
+    --shadow-medium: 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-large: 0 25px 50px -12px hsl(0 0% 0% / 0.25);
+  }
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    cursor: none !important;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    cursor: none !important;
+  }
+
+  /* Hide cursor on all interactive elements */
+  a, button, input, textarea, select, [role="button"], [tabindex]:not([tabindex="-1"]) {
+    cursor: none !important;
+  }
+
+  /* Hide cursor on hover states */
+  a:hover, button:hover, input:hover, textarea:hover, select:hover, [role="button"]:hover {
+    cursor: none !important;
+  }
+
+  /* Typography system */
+  .font-display {
+    font-family: var(--font-display);
+    font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  /* Responsive layout utilities */
+  .container-custom {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
+  }
+
+  @media (min-width: 640px) {
+    .container-custom {
+      padding: var(--container-padding-sm);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-custom {
+      padding: var(--container-padding-lg);
+    }
+  }
+
+  .section-padding {
+    padding: var(--section-padding-mobile);
+  }
+
+  @media (min-width: 768px) {
+    .section-padding {
+      padding: var(--section-padding-tablet);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding: var(--section-padding);
+    }
+  }
+
+  /* Animation utilities */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-smooth;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-scale {
+    @apply transition-smooth;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  /* Text reveal animation */
+  .text-reveal {
+    @apply opacity-0 translate-y-4 transition-all duration-700 ease-out;
+  }
+
+  .text-reveal.in-view {
+    @apply opacity-100 translate-y-0;
+  }
+
+  /* Underline animation */
+  .underline-animation {
+    @apply relative;
+  }
+
+  .underline-animation::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out;
+  }
+
+  .underline-animation:hover::after {
+    @apply w-full;
+  }
+
+  /* Enhanced scroll reveal animation system */
+  .scroll-reveal {
+    @apply transition-all duration-700 ease-out;
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+
+  .scroll-reveal.in-view {
+    @apply opacity-100;
+    transform: translateY(0);
+  }
+
+  /* Progressive fade system to eliminate cut-offs */
+  .section-fade-in {
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--background) / 0) 0%,
+      hsl(var(--background) / 0.8) 10%,
+      hsl(var(--background) / 1) 20%,
+      hsl(var(--background) / 1) 80%,
+      hsl(var(--background) / 0.8) 90%,
+      hsl(var(--background) / 0) 100%
+    );
+  }
+
+  /* Smooth element transitions */
+  .element-transition {
+    @apply transition-all duration-500 ease-out;
+    will-change: transform, opacity;
+  }
+
+  /* Stagger animation utilities */
+  .stagger-animation > * {
+    animation-delay: calc(var(--index, 0) * var(--stagger-delay));
+  }
+
+  .parallax-element {
+    transform: translateY(calc(var(--scroll-y, 0) * var(--parallax-speed)));
+  }
+
+  .hover-lift {
+    transition: var(--transition-smooth);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(var(--hover-scale));
+    box-shadow: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+  }
+
+  .micro-interaction {
+    transition: var(--micro-bounce);
+  }
+
+  .micro-interaction:hover {
+    transform: scale(1.02);
+  }
+
+  .loading-shimmer {
+    background: linear-gradient(90deg, transparent, hsl(var(--muted)/0.5), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .page-transition-enter {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: pageEnter 0.6s ease-out forwards;
+  }
+
+  .interactive-button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .interactive-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)/0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .interactive-button:hover::before {
+    left: 100%;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes iconSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 5px hsl(var(--primary)/0.5);
+    }
+    50% { 
+      box-shadow: 0 0 20px hsl(var(--primary)/0.8), 0 0 30px hsl(var(--primary)/0.6);
+    }
+  }
+
+}
