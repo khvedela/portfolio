@@ -811,7 +811,7 @@ const BrutalistTerminal = () => {
           >
             <motion.div
               className="w-full h-full lg:w-auto lg:h-[600px] max-w-3xl bg-background border-4 border-foreground shadow-brutalist-lg flex flex-col"
-              style={{ width: window.innerWidth >= 1024 ? '48rem' : '100%' }}
+              style={{ width: window.innerWidth >= 1024 ? "48rem" : "100%" }}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
