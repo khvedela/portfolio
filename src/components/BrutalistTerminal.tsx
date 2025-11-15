@@ -5,6 +5,7 @@ import { useBrutalistToast } from "@/hooks/useBrutalistToast";
 import TerminalSnake from "./TerminalSnake";
 import TerminalTypingGame from "./TerminalTypingGame";
 import DraggableWindow from "./DraggableWindow";
+import TerminalKeyboard from "./TerminalKeyboard";
 
 interface TerminalLine {
   type: "input" | "output" | "error" | "success";
@@ -29,9 +30,21 @@ const BrutalistTerminal = () => {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [gameWindows, setGameWindows] = useState<GameWindow[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const historyRef = useRef<HTMLDivElement>(null);
+  const terminalBodyRef = useRef<HTMLDivElement>(null);
   const { copyToClipboard } = useBrutalistToast();
+
+  // Detect if on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Sound effects
   const playSound = (type: "key" | "enter" | "error" | "success") => {
@@ -149,9 +162,38 @@ const BrutalistTerminal = () => {
   // Focus input when terminal opens and boot completes
   useEffect(() => {
     if (isOpen && !isBooting && inputRef.current) {
-      inputRef.current.focus();
+      // Delay focus slightly to allow keyboard to settle
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        // Scroll input into view on mobile when keyboard opens
+        inputRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, isBooting]);
+
+  // Handle input focus - ensure input stays visible when keyboard appears
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const handleFocus = () => {
+      // Scroll to keep input in view when mobile keyboard appears
+      setTimeout(() => {
+        input.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+          inline: "nearest",
+        });
+      }, 300); // Delay to allow keyboard animation
+    };
+
+    input.addEventListener("focus", handleFocus);
+    return () => input.removeEventListener("focus", handleFocus);
+  }, []);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -672,28 +714,60 @@ const BrutalistTerminal = () => {
     // Navigate command history with up/down arrows
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      if (commandHistory.length > 0) {
-        const newIndex =
-          historyIndex === -1
-            ? commandHistory.length - 1
-            : Math.max(0, historyIndex - 1);
-        setHistoryIndex(newIndex);
-        setInput(commandHistory[newIndex]);
-      }
+      navigateHistoryUp();
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      if (historyIndex !== -1) {
-        const newIndex = Math.min(commandHistory.length - 1, historyIndex + 1);
-        if (
-          newIndex === commandHistory.length - 1 &&
-          historyIndex === newIndex
-        ) {
-          setHistoryIndex(-1);
-          setInput("");
-        } else {
-          setHistoryIndex(newIndex);
-          setInput(commandHistory[newIndex]);
-        }
+      navigateHistoryDown();
+    }
+  };
+
+  // Keyboard handlers for custom mobile keyboard
+  const handleMobileKeyPress = (key: string) => {
+    setInput((prev) => prev + key);
+    playSound("key");
+  };
+
+  const handleMobileBackspace = () => {
+    setInput((prev) => prev.slice(0, -1));
+    playSound("key");
+  };
+
+  const handleMobileEnter = () => {
+    if (input.trim()) {
+      executeCommand(input);
+      setInput("");
+      setSuggestion("");
+    }
+  };
+
+  const handleMobileTab = () => {
+    if (suggestion) {
+      setInput(suggestion);
+      setSuggestion("");
+      playSound("success");
+    }
+  };
+
+  const navigateHistoryUp = () => {
+    if (commandHistory.length > 0) {
+      const newIndex =
+        historyIndex === -1
+          ? commandHistory.length - 1
+          : Math.max(0, historyIndex - 1);
+      setHistoryIndex(newIndex);
+      setInput(commandHistory[newIndex]);
+    }
+  };
+
+  const navigateHistoryDown = () => {
+    if (historyIndex !== -1) {
+      const newIndex = Math.min(commandHistory.length - 1, historyIndex + 1);
+      if (newIndex === commandHistory.length - 1 && historyIndex === newIndex) {
+        setHistoryIndex(-1);
+        setInput("");
+      } else {
+        setHistoryIndex(newIndex);
+        setInput(commandHistory[newIndex]);
       }
     }
   };
@@ -729,28 +803,31 @@ const BrutalistTerminal = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="no-print fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-background/50 backdrop-blur-sm"
+            className="no-print fixed inset-0 z-[9998] flex items-center justify-center p-2 lg:p-4 bg-background/50 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
           >
             <motion.div
-              className="w-full max-w-3xl bg-background border-4 border-foreground shadow-brutalist-lg"
+              className="w-full h-full lg:h-auto max-w-3xl bg-background border-4 border-foreground shadow-brutalist-lg flex flex-col"
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Terminal header */}
-              <div className="flex items-center justify-between bg-foreground text-background px-4 py-3 border-b-4 border-foreground">
+              <div className="flex items-center justify-between bg-foreground text-background px-3 lg:px-4 py-2 lg:py-3 border-b-4 border-foreground shrink-0">
                 <div className="flex items-center gap-2">
-                  <TerminalIcon size={18} />
-                  <span className="font-mono font-bold uppercase text-sm">
-                    System Terminal {isBooting && `- Booting ${bootProgress}%`}
+                  <TerminalIcon size={16} className="lg:hidden" />
+                  <TerminalIcon size={18} className="hidden lg:block" />
+                  <span className="font-mono font-bold uppercase text-xs lg:text-sm">
+                    <span className="hidden lg:inline">System Terminal</span>
+                    <span className="lg:hidden">Terminal</span>
+                    {isBooting && ` - ${bootProgress}%`}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 lg:gap-2">
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
                     className="hover:bg-background hover:text-foreground transition-colors p-1 border-2 border-transparent hover:border-background"
@@ -758,9 +835,9 @@ const BrutalistTerminal = () => {
                     title={soundEnabled ? "Mute sounds" : "Enable sounds"}
                   >
                     {soundEnabled ? (
-                      <Volume2 size={18} />
+                      <Volume2 size={16} className="lg:w-[18px] lg:h-[18px]" />
                     ) : (
-                      <VolumeX size={18} />
+                      <VolumeX size={16} className="lg:w-[18px] lg:h-[18px]" />
                     )}
                   </button>
                   <button
@@ -772,17 +849,17 @@ const BrutalistTerminal = () => {
                     className="hover:bg-background hover:text-foreground transition-colors p-1 border-2 border-transparent hover:border-background"
                     aria-label="Close terminal"
                   >
-                    <X size={18} />
+                    <X size={16} className="lg:w-[18px] lg:h-[18px]" />
                   </button>
                 </div>
               </div>
 
               {/* Terminal body */}
-              <div className="bg-background p-4 font-mono text-sm">
+              <div className="bg-background p-3 lg:p-4 font-mono text-xs lg:text-sm flex-1 flex flex-col overflow-hidden">
                 {/* Command history */}
                 <div
                   ref={historyRef}
-                  className="h-96 overflow-y-auto mb-4 space-y-1"
+                  className="flex-1 overflow-y-auto mb-3 lg:mb-4 space-y-1 pb-4"
                   style={{ scrollbarWidth: "thin" }}
                 >
                   {history.map((line, index) => (
@@ -822,21 +899,36 @@ const BrutalistTerminal = () => {
                       value={input}
                       onChange={handleInputChange}
                       onKeyDown={handleKeyDown}
-                      className="w-full bg-transparent outline-none text-foreground font-mono caret-primary relative z-10"
-                      placeholder="Type 'help' for commands..."
+                      className="w-full bg-transparent outline-none text-foreground font-mono caret-primary relative z-10 text-xs lg:text-sm"
+                      placeholder="Type 'help'..."
                       autoComplete="off"
                       spellCheck={false}
                       disabled={isBooting}
+                      readOnly={isMobile}
+                      inputMode={isMobile ? "none" : "text"}
                     />
                   </div>
                 </form>
               </div>
 
+              {/* Custom Mobile Keyboard - only shown on mobile */}
+              <div className="lg:hidden">
+                <TerminalKeyboard
+                  onKeyPress={handleMobileKeyPress}
+                  onBackspace={handleMobileBackspace}
+                  onEnter={handleMobileEnter}
+                  onArrowUp={navigateHistoryUp}
+                  onArrowDown={navigateHistoryDown}
+                  onTab={handleMobileTab}
+                />
+              </div>
+
               {/* Terminal footer */}
-              <div className="bg-foreground/5 px-4 py-2 border-t-2 border-foreground/20 flex items-center justify-between text-xs font-mono text-muted-foreground">
-                <span>
+              <div className="bg-foreground/5 px-3 lg:px-4 py-2 border-t-2 border-foreground/20 flex flex-col lg:flex-row items-start lg:items-center justify-between text-[10px] lg:text-xs font-mono text-muted-foreground gap-1 lg:gap-0 shrink-0">
+                <span className="hidden lg:inline">
                   Press ESC or click outside to close | Tab to autocomplete
                 </span>
+                <span className="lg:hidden">Use keyboard below</span>
                 <span>
                   ↑↓ history | {soundEnabled ? "🔊" : "🔇"} sounds{" "}
                   {soundEnabled ? "on" : "off"}
@@ -871,6 +963,7 @@ const BrutalistTerminal = () => {
         >
           {window.type === "snake" ? (
             <TerminalSnake
+              isMobile={isMobile}
               onGameOver={(score) => {
                 setGameWindows(gameWindows.filter((w) => w.id !== window.id));
                 setHistory((prev) => [
@@ -893,6 +986,17 @@ const BrutalistTerminal = () => {
             />
           ) : (
             <TerminalTypingGame
+              isMobile={isMobile}
+              mobileKeyboard={
+                <TerminalKeyboard
+                  onKeyPress={handleMobileKeyPress}
+                  onBackspace={handleMobileBackspace}
+                  onEnter={handleMobileEnter}
+                  onArrowUp={navigateHistoryUp}
+                  onArrowDown={navigateHistoryDown}
+                  onTab={handleMobileTab}
+                />
+              }
               onComplete={(wpm, accuracy) => {
                 setGameWindows(gameWindows.filter((w) => w.id !== window.id));
                 setHistory((prev) => [

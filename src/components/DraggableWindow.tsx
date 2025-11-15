@@ -11,6 +11,22 @@ interface DraggableWindowProps {
   height?: number;
 }
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+};
+
 const DraggableWindow = ({
   title,
   onClose,
@@ -20,6 +36,7 @@ const DraggableWindow = ({
   width = 400,
   height = 500,
 }: DraggableWindowProps) => {
+  const isMobile = useIsMobile();
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [isDragging, setIsDragging] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -65,12 +82,13 @@ const DraggableWindow = ({
   }, [isDragging, isMaximized]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (isMaximized) return;
+    if (isMaximized || isMobile) return;
     setIsDragging(true);
     dragRef.current = { startX: e.clientX, startY: e.clientY };
   };
 
   const toggleMaximize = () => {
+    if (isMobile) return; // No maximize on mobile (always fullscreen)
     if (isMaximized) {
       setPosition(prevPosition);
       setIsMaximized(false);
@@ -82,34 +100,53 @@ const DraggableWindow = ({
     }
   };
 
+  // Auto-maximize on mobile
+  useEffect(() => {
+    if (isMobile && !isMaximized) {
+      setPrevPosition(position);
+      setPrevSize({ width, height });
+      setPosition({ x: 0, y: 0 });
+      setIsMaximized(true);
+    } else if (!isMobile && isMaximized && prevPosition.x !== 0) {
+      // Restore position when switching back to desktop
+      setPosition(prevPosition);
+      setIsMaximized(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile]);
+
   return (
     <div
       ref={windowRef}
       className="fixed bg-background border-4 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-[10000]"
       style={{
-        left: isMaximized ? 0 : position.x,
-        top: isMaximized ? 0 : position.y,
-        width: isMaximized ? "100vw" : width,
-        height: isMaximized ? "100vh" : height,
+        left: isMaximized || isMobile ? 0 : position.x,
+        top: isMaximized || isMobile ? 0 : position.y,
+        width: isMaximized || isMobile ? "100vw" : width,
+        height: isMaximized || isMobile ? "100vh" : height,
         transition: isMaximized ? "all 0.2s ease" : "none",
       }}
     >
       {/* Title Bar */}
       <div
-        className="bg-primary text-primary-foreground px-3 py-2 flex items-center justify-between border-b-4 border-foreground cursor-move select-none"
+        className={`bg-primary text-primary-foreground px-3 py-2 flex items-center justify-between border-b-4 border-foreground select-none ${
+          isMobile ? "cursor-default" : "cursor-move"
+        }`}
         onMouseDown={handleMouseDown}
       >
         <span className="font-bold text-sm uppercase tracking-wider">
           {title}
         </span>
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleMaximize}
-            className="hover:bg-foreground/20 p-1 transition-colors"
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
+          {!isMobile && (
+            <button
+              onClick={toggleMaximize}
+              className="hover:bg-foreground/20 p-1 transition-colors"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            </button>
+          )}
           <button
             onClick={onClose}
             className="hover:bg-destructive p-1 transition-colors"

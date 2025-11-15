@@ -1,11 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 
 interface TypingGameProps {
   onComplete: (wpm: number, accuracy: number) => void;
   onQuit: () => void;
+  isMobile?: boolean;
+  mobileKeyboard?: ReactNode;
 }
 
-const TerminalTypingGame = ({ onComplete, onQuit }: TypingGameProps) => {
+const TerminalTypingGame = ({
+  onComplete,
+  onQuit,
+  isMobile = false,
+  mobileKeyboard,
+}: TypingGameProps) => {
   const phrases = [
     "the quick brown fox jumps over the lazy dog",
     "typescript is awesome for building scalable applications",
@@ -125,6 +132,8 @@ const TerminalTypingGame = ({ onComplete, onQuit }: TypingGameProps) => {
           placeholder="Start typing here..."
           autoComplete="off"
           spellCheck={false}
+          readOnly={isMobile}
+          inputMode={isMobile ? "none" : "text"}
         />
       </div>
 
@@ -171,8 +180,13 @@ const TerminalTypingGame = ({ onComplete, onQuit }: TypingGameProps) => {
       )}
 
       <div className="mt-4 text-xs text-muted-foreground text-center">
-        Press ESC to quit
+        {isMobile ? "Use keyboard below" : "Press ESC to quit"}
       </div>
+
+      {/* Mobile Keyboard */}
+      {isMobile && mobileKeyboard && (
+        <div className="mt-4">{mobileKeyboard}</div>
+      )}
     </div>
   );
 };

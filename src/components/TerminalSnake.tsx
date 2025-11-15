@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 
 interface Position {
   x: number;
@@ -8,11 +9,16 @@ interface Position {
 interface SnakeGameProps {
   onGameOver: (score: number) => void;
   onQuit: () => void;
+  isMobile?: boolean;
 }
 
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 
-const TerminalSnake = ({ onGameOver, onQuit }: SnakeGameProps) => {
+const TerminalSnake = ({
+  onGameOver,
+  onQuit,
+  isMobile = false,
+}: SnakeGameProps) => {
   const GRID_SIZE = 15;
   const CELL_SIZE = 20;
   const GAME_SPEED = 120; // Faster update for better responsiveness
@@ -149,6 +155,11 @@ const TerminalSnake = ({ onGameOver, onQuit }: SnakeGameProps) => {
     directionRef.current = "RIGHT";
     directionQueueRef.current = [];
     lastDirectionRef.current = "RIGHT";
+  };
+
+  const handleDirectionPress = (direction: Direction) => {
+    if (isPaused || gameOver) return;
+    queueDirection(direction);
   };
 
   useEffect(() => {
@@ -328,9 +339,78 @@ const TerminalSnake = ({ onGameOver, onQuit }: SnakeGameProps) => {
       </div>
 
       <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-        <div>Controls: ↑↓←→ or WASD to move</div>
-        <div>SPACE to pause/restart | R to restart | ESC to quit</div>
+        {!isMobile && (
+          <>
+            <div>Controls: ↑↓←→ or WASD to move</div>
+            <div>SPACE to pause/restart | R to restart | ESC to quit</div>
+          </>
+        )}
       </div>
+
+      {/* Mobile Controls */}
+      {isMobile && (
+        <div className="mt-4 space-y-3">
+          <div className="flex flex-col items-center gap-2">
+            {/* Up */}
+            <button
+              onClick={() => handleDirectionPress("UP")}
+              disabled={gameOver}
+              className="w-16 h-16 bg-primary text-primary-foreground border-3 border-foreground active:bg-primary/80 disabled:opacity-50 flex items-center justify-center font-bold transition-colors"
+            >
+              <ArrowUp size={24} />
+            </button>
+            {/* Left, Down, Right */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleDirectionPress("LEFT")}
+                disabled={gameOver}
+                className="w-16 h-16 bg-primary text-primary-foreground border-3 border-foreground active:bg-primary/80 disabled:opacity-50 flex items-center justify-center font-bold transition-colors"
+              >
+                <ArrowLeft size={24} />
+              </button>
+              <button
+                onClick={() => handleDirectionPress("DOWN")}
+                disabled={gameOver}
+                className="w-16 h-16 bg-primary text-primary-foreground border-3 border-foreground active:bg-primary/80 disabled:opacity-50 flex items-center justify-center font-bold transition-colors"
+              >
+                <ArrowDown size={24} />
+              </button>
+              <button
+                onClick={() => handleDirectionPress("RIGHT")}
+                disabled={gameOver}
+                className="w-16 h-16 bg-primary text-primary-foreground active:bg-primary/80 disabled:opacity-50 flex items-center justify-center font-bold transition-colors border-3 border-foreground"
+              >
+                <ArrowRight size={24} />
+              </button>
+            </div>
+          </div>
+          {/* Mobile action buttons */}
+          <div className="flex gap-2 justify-center">
+            {!gameOver && (
+              <button
+                onClick={() => setIsPaused((prev) => !prev)}
+                className="px-4 py-2 bg-background text-foreground border-3 border-foreground active:bg-foreground/10 transition-colors font-bold text-sm"
+              >
+                {isPaused ? "RESUME" : "PAUSE"}
+              </button>
+            )}
+            {gameOver && (
+              <button
+                onClick={restartGame}
+                className="px-4 py-2 bg-primary text-primary-foreground border-3 border-foreground active:bg-primary/80 transition-colors font-bold text-sm"
+              >
+                RESTART
+              </button>
+            )}
+            <button
+              onClick={onQuit}
+              className="px-4 py-2 bg-destructive text-destructive-foreground border-3 border-foreground active:bg-destructive/80 transition-colors font-bold text-sm"
+            >
+              QUIT
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
