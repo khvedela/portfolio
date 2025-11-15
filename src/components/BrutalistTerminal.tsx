@@ -703,19 +703,25 @@ const BrutalistTerminal = () => {
       {/* Terminal toggle hint - shown when closed */}
       {!isOpen && (
         <motion.div
-          className="no-print fixed bottom-6 right-6 z-[100] font-mono text-xs text-muted-foreground flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 border-2 border-foreground/20"
+          className="no-print fixed bottom-6 left-6 lg:left-auto lg:right-6 z-[100] font-mono text-xs text-muted-foreground flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 border-2 border-foreground/20 w-fit cursor-pointer hover:bg-background/90 hover:border-foreground/40 active:scale-95 transition-all"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
+          onClick={() => {
+            setIsBooting(true);
+            setIsOpen(true);
+          }}
+          whileTap={{ scale: 0.95 }}
         >
           <TerminalIcon size={14} />
-          <span>
+          <span className="hidden lg:inline">
             Press{" "}
             <kbd className="px-1.5 py-0.5 bg-foreground/10 border border-foreground/30">
               T
             </kbd>{" "}
             to open terminal
           </span>
+          <span className="lg:hidden">Tap to open terminal</span>
         </motion.div>
       )}
 

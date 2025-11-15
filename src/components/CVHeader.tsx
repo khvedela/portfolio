@@ -6,6 +6,7 @@ import BrutalistToast from "./BrutalistToast";
 
 const CVHeader = () => {
   const [hoveredIcon, setHoveredIcon] = useState<number | null>(null);
+  const [easterEggClicks, setEasterEggClicks] = useState(0);
   const { toast, hideToast, copyToClipboard } = useBrutalistToast();
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -16,6 +17,26 @@ const CVHeader = () => {
         delayChildren: 0.1,
       },
     },
+  };
+
+  const handleEasterEgg = () => {
+    const messages = [
+      "🤔 Curious, aren't we?",
+      "🔍 Still clicking? There might be something here...",
+      "🎯 You're persistent! Keep going...",
+      "🌟 Almost there! One more click...",
+      "🎉 You found it! devdavid.me - But you already knew that, didn't you? 😏",
+    ];
+
+    const newCount = easterEggClicks + 1;
+    setEasterEggClicks(newCount);
+
+    if (newCount <= messages.length) {
+      copyToClipboard(
+        newCount === messages.length ? "https://devdavid.me" : "",
+        messages[newCount - 1]
+      );
+    }
   };
 
   const itemVariants = {
@@ -123,11 +144,12 @@ const CVHeader = () => {
             },
             {
               icon: Globe,
-              text: "devdavid.me",
-              copyText: "https://devdavid.me",
-              href: "https://devdavid.me",
+              text: "???",
+              copyText: "",
+              href: "#",
               color: "accent",
               copyable: false,
+              isEasterEgg: true,
             },
             {
               icon: Linkedin,
@@ -172,6 +194,13 @@ const CVHeader = () => {
                     }
                     title={contact.text}
                     onClick={(e) => {
+                      // Easter egg handler
+                      if (contact.isEasterEgg) {
+                        e.preventDefault();
+                        handleEasterEgg();
+                        return;
+                      }
+
                       // On mobile (touch devices), if copyable, copy instead of navigate
                       if (contact.copyable && "ontouchstart" in window) {
                         e.preventDefault();
@@ -193,11 +222,23 @@ const CVHeader = () => {
                   >
                     <motion.div
                       animate={{
-                        scale: hoveredIcon === index ? 1.2 : 1,
+                        scale:
+                          hoveredIcon === index
+                            ? 1.2
+                            : contact.isEasterEgg
+                            ? [1, 1.1, 1]
+                            : 1,
                         rotate: hoveredIcon === index ? [0, -5, 5, 0] : 0,
                       }}
                       transition={{
                         duration: 0.3,
+                        scale: contact.isEasterEgg
+                          ? {
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }
+                          : undefined,
                         rotate: {
                           duration: 0.5,
                           repeat: hoveredIcon === index ? Infinity : 0,
@@ -207,6 +248,23 @@ const CVHeader = () => {
                       <Icon size={20} />
                     </motion.div>
                   </motion.a>
+
+                  {/* Easter egg indicator - mysterious question mark */}
+                  {contact.isEasterEgg && (
+                    <motion.div
+                      className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary border-2 border-foreground flex items-center justify-center pointer-events-none font-bold text-[8px]"
+                      animate={{
+                        opacity: [0.6, 1, 0.6],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      ?
+                    </motion.div>
+                  )}
 
                   {/* Mobile tap indicator - shows on copyable items */}
                   {contact.copyable && (
