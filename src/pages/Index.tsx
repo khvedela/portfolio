@@ -10,6 +10,7 @@ import CVLanguages from "@/components/CVLanguages";
 import CustomCursor from "@/components/CustomCursor";
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
+import BrutalistTerminal from "@/components/BrutalistTerminal";
 
 const Index = () => {
   const [isDark, setIsDark] = useState(false);
@@ -39,6 +40,9 @@ const Index = () => {
     <>
       {/* Custom cursor - always visible */}
       <CustomCursor />
+
+      {/* Brutalist Terminal - toggleable with backtick */}
+      <BrutalistTerminal />
 
       {/* Show only loading screen if it hasn't been dismissed */}
       <AnimatePresence mode="wait">
