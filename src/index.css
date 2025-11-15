@@ -167,13 +167,6 @@
     will-change: transform;
   }
 
-  /* Restore cursor for inputs and text areas */
-  input,
-  textarea,
-  select {
-    cursor: text !important;
-  }
-
   /* Keep default cursor for print mode and mobile */
   @media print {
     *,

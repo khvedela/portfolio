@@ -2,11 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Terminal as TerminalIcon, Volume2, VolumeX } from "lucide-react";
 import { useBrutalistToast } from "@/hooks/useBrutalistToast";
+import TerminalSnake from "./TerminalSnake";
+import TerminalTypingGame from "./TerminalTypingGame";
+import DraggableWindow from "./DraggableWindow";
 
 interface TerminalLine {
   type: "input" | "output" | "error" | "success";
   content: string;
 }
+
+type GameWindow = {
+  id: string;
+  type: "snake" | "typing";
+  x: number;
+  y: number;
+};
 
 const BrutalistTerminal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +28,7 @@ const BrutalistTerminal = () => {
   const [history, setHistory] = useState<TerminalLine[]>([]);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [gameWindows, setGameWindows] = useState<GameWindow[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const historyRef = useRef<HTMLDivElement>(null);
   const { copyToClipboard } = useBrutalistToast();
@@ -26,9 +37,9 @@ const BrutalistTerminal = () => {
   const playSound = (type: "key" | "enter" | "error" | "success") => {
     if (!soundEnabled) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const audioContext = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+      // @ts-expect-error - webkitAudioContext for Safari compatibility
+      window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -67,11 +78,12 @@ const BrutalistTerminal = () => {
   // Toggle terminal with backtick key and run boot sequence
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "`" && !isOpen && !isBooting) {
+      if (e.key === "t" && !isOpen && !isBooting) {
         e.preventDefault();
         setIsBooting(true);
         setIsOpen(true);
-      } else if (e.key === "Escape" && isOpen) {
+      } else if (e.key === "Escape" && isOpen && gameWindows.length === 0) {
+        // Only close terminal if no game windows are open
         setIsOpen(false);
         setIsBooting(false);
         setBootProgress(0);
@@ -80,7 +92,7 @@ const BrutalistTerminal = () => {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [isOpen, isBooting]);
+  }, [isOpen, isBooting, gameWindows.length]);
 
   // Boot sequence animation
   useEffect(() => {
@@ -177,6 +189,7 @@ const BrutalistTerminal = () => {
           "cat           - Display content",
           "─────────────────────────────────────",
           "Try exploring... there might be easter eggs 🥚",
+          "Hint: Try 'snake' or 'typing' for mini-games!",
           "",
         ];
         playSound("success");
@@ -366,14 +379,18 @@ const BrutalistTerminal = () => {
       },
     },
     cat: {
-      description: "Display content",
+      description: "Display file contents (try: cat skills.txt)",
       action: () => {
         playSound("success");
         setHistory((prev) => [
           ...prev,
           {
             type: "output",
-            content: "Usage: Try 'cat skills.txt' or 'cat about.md'",
+            content: "Usage: cat <filename>",
+          },
+          {
+            type: "output",
+            content: "Available files: skills.txt, about.md, contact.txt",
           },
         ]);
       },
@@ -477,6 +494,48 @@ const BrutalistTerminal = () => {
         ]);
       },
     },
+    snake: {
+      description: "Play Snake game",
+      hidden: true,
+      action: () => {
+        const newWindow: GameWindow = {
+          id: `snake-${Date.now()}`,
+          type: "snake",
+          x: 150 + gameWindows.length * 30,
+          y: 150 + gameWindows.length * 30,
+        };
+        setGameWindows([...gameWindows, newWindow]);
+        playSound("success");
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: "success",
+            content: "Launching Snake game in new window...",
+          },
+        ]);
+      },
+    },
+    typing: {
+      description: "Typing speed test",
+      hidden: true,
+      action: () => {
+        const newWindow: GameWindow = {
+          id: `typing-${Date.now()}`,
+          type: "typing",
+          x: 150 + gameWindows.length * 30,
+          y: 150 + gameWindows.length * 30,
+        };
+        setGameWindows([...gameWindows, newWindow]);
+        playSound("success");
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: "success",
+            content: "Launching Typing Test in new window...",
+          },
+        ]);
+      },
+    },
   };
 
   // Autocomplete functionality
@@ -497,7 +556,10 @@ const BrutalistTerminal = () => {
   }, [input]);
 
   const executeCommand = (cmd: string) => {
-    const trimmedCmd = cmd.trim().toLowerCase();
+    const trimmedCmd = cmd.trim();
+    const parts = trimmedCmd.split(/\s+/);
+    const commandName = parts[0].toLowerCase();
+    const args = parts.slice(1);
 
     // Add to history
     setHistory((prev) => [...prev, { type: "input", content: `> ${cmd}` }]);
@@ -510,15 +572,73 @@ const BrutalistTerminal = () => {
 
     playSound("enter");
 
-    if (commands[trimmedCmd]) {
-      commands[trimmedCmd].action();
+    // Handle cat command with arguments
+    if (commandName === "cat" && args.length > 0) {
+      const filename = args[0].toLowerCase();
+      const fileContents: Record<string, string[]> = {
+        "skills.txt": [
+          "=== Technical Skills ===",
+          "",
+          "Languages: TypeScript, JavaScript, Python, Go",
+          "Frontend: React, Vue, Next.js, Tailwind CSS",
+          "Backend: Node.js, Express, PostgreSQL, Redis",
+          "DevOps: Docker, Kubernetes, AWS, CI/CD",
+          "Tools: Git, VSCode, Figma, Linear",
+        ],
+        "about.md": [
+          "# About Me",
+          "",
+          "Full-stack developer with a passion for creating",
+          "beautiful, performant, and accessible web applications.",
+          "",
+          "I believe in writing clean code, building great UX,",
+          "and shipping features that users actually need.",
+        ],
+        "contact.txt": [
+          "=== Contact Information ===",
+          "",
+          "Email: your-email@example.com",
+          "GitHub: github.com/yourusername",
+          "LinkedIn: linkedin.com/in/yourusername",
+          "Portfolio: yourwebsite.com",
+        ],
+      };
+
+      if (fileContents[filename]) {
+        playSound("success");
+        setHistory((prev) => [
+          ...prev,
+          ...fileContents[filename].map((line) => ({
+            type: "output" as const,
+            content: line,
+          })),
+        ]);
+      } else {
+        playSound("error");
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: "error",
+            content: `cat: ${filename}: No such file or directory`,
+          },
+          {
+            type: "output",
+            content: "Available files: skills.txt, about.md, contact.txt",
+          },
+        ]);
+      }
+      return;
+    }
+
+    if (commands[commandName]) {
+      commands[commandName].action();
     } else {
       playSound("error");
       setHistory((prev) => [
         ...prev,
         {
           type: "error",
-          content: `Command not found: '${trimmedCmd}'. Type 'help' for available commands.`,
+          content: `Command not found: '${commandName}'. Type 'help' for available commands.`,
         },
       ]);
     }
@@ -592,7 +712,7 @@ const BrutalistTerminal = () => {
           <span>
             Press{" "}
             <kbd className="px-1.5 py-0.5 bg-foreground/10 border border-foreground/30">
-              `
+              T
             </kbd>{" "}
             to open terminal
           </span>
@@ -663,11 +783,11 @@ const BrutalistTerminal = () => {
                     <div
                       key={index}
                       className={`
-                        ${line.type === "input" ? "text-primary font-bold" : ""}
-                        ${line.type === "error" ? "text-red-500" : ""}
-                        ${line.type === "success" ? "text-green-500" : ""}
-                        ${line.type === "output" ? "text-foreground" : ""}
-                      `}
+                    ${line.type === "input" ? "text-primary font-bold" : ""}
+                    ${line.type === "error" ? "text-red-500" : ""}
+                    ${line.type === "success" ? "text-green-500" : ""}
+                    ${line.type === "output" ? "text-foreground" : ""}
+                  `}
                     >
                       {line.content}
                     </div>
@@ -720,6 +840,80 @@ const BrutalistTerminal = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Draggable Game Windows */}
+      {gameWindows.map((window) => (
+        <DraggableWindow
+          key={window.id}
+          title={window.type === "snake" ? "🐍 SNAKE GAME" : "⌨️  TYPING TEST"}
+          initialX={window.x}
+          initialY={window.y}
+          width={window.type === "snake" ? 450 : 600}
+          height={window.type === "snake" ? 600 : 500}
+          onClose={() => {
+            setGameWindows(gameWindows.filter((w) => w.id !== window.id));
+            setHistory((prev) => [
+              ...prev,
+              {
+                type: "output",
+                content: `${
+                  window.type === "snake" ? "Snake game" : "Typing test"
+                } closed.`,
+              },
+            ]);
+          }}
+        >
+          {window.type === "snake" ? (
+            <TerminalSnake
+              onGameOver={(score) => {
+                setGameWindows(gameWindows.filter((w) => w.id !== window.id));
+                setHistory((prev) => [
+                  ...prev,
+                  { type: "output", content: "" },
+                  {
+                    type: "success",
+                    content: `🐍 Game Over! Final Score: ${score}`,
+                  },
+                  { type: "output", content: "" },
+                ]);
+              }}
+              onQuit={() => {
+                setGameWindows(gameWindows.filter((w) => w.id !== window.id));
+                setHistory((prev) => [
+                  ...prev,
+                  { type: "output", content: "Snake game exited." },
+                ]);
+              }}
+            />
+          ) : (
+            <TerminalTypingGame
+              onComplete={(wpm, accuracy) => {
+                setGameWindows(gameWindows.filter((w) => w.id !== window.id));
+                setHistory((prev) => [
+                  ...prev,
+                  { type: "output", content: "" },
+                  {
+                    type: "success",
+                    content: `⌨️  Typing Test Complete!`,
+                  },
+                  {
+                    type: "output",
+                    content: `Speed: ${wpm} WPM | Accuracy: ${accuracy}%`,
+                  },
+                  { type: "output", content: "" },
+                ]);
+              }}
+              onQuit={() => {
+                setGameWindows(gameWindows.filter((w) => w.id !== window.id));
+                setHistory((prev) => [
+                  ...prev,
+                  { type: "output", content: "Typing test exited." },
+                ]);
+              }}
+            />
+          )}
+        </DraggableWindow>
+      ))}
     </>
   );
 };

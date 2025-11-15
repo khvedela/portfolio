@@ -41,7 +41,7 @@ const Index = () => {
       {/* Custom cursor - always visible */}
       <CustomCursor />
 
-      {/* Brutalist Terminal - toggleable with backtick */}
+      {/* Brutalist Terminal - toggleable with 't' key */}
       <BrutalistTerminal />
 
       {/* Show only loading screen if it hasn't been dismissed */}
