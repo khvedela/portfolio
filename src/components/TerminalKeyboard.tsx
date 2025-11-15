@@ -20,8 +20,8 @@ const TerminalKeyboard = ({
 }: TerminalKeyboardProps) => {
   const commonKeys = [
     ["help", "clear", "about"],
-    ["skills", "snake", "typing"],
-    ["ls", "cat", "pwd"],
+    ["skills", "blog", "snake"],
+    ["typing", "ls", "pwd"],
   ];
 
   const charKeys = [

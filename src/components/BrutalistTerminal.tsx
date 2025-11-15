@@ -6,6 +6,7 @@ import TerminalSnake from "./TerminalSnake";
 import TerminalTypingGame from "./TerminalTypingGame";
 import DraggableWindow from "./DraggableWindow";
 import TerminalKeyboard from "./TerminalKeyboard";
+import { blogPosts, getBlogPost } from "@/blog/posts";
 
 interface TerminalLine {
   type: "input" | "output" | "error" | "success";
@@ -219,6 +220,8 @@ const BrutalistTerminal = () => {
           "linkedin      - Open LinkedIn profile",
           "skills        - List technical skills",
           "experience    - Show work experience",
+          "blog          - List all blog posts",
+          "blog read <#> - Read a specific blog post",
           "clear         - Clear terminal history",
           "close         - Close terminal window",
           "theme         - Toggle dark/light mode",
@@ -578,6 +581,53 @@ const BrutalistTerminal = () => {
         ]);
       },
     },
+    blog: {
+      description: "List all blog posts",
+      action: () => {
+        const posts = blogPosts
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+          .map((post, index) => {
+            const date = new Date(post.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            });
+            return `${index + 1}. ${post.title} (${date}) - ${
+              post.readTime
+            } min`;
+          });
+
+        playSound("success");
+        setHistory((prev) => [
+          ...prev,
+          { type: "output", content: "" },
+          { type: "success", content: "📝 BLOG POSTS:" },
+          { type: "output", content: "─────────────────────────────────────" },
+          ...posts.map((post) => ({ type: "output" as const, content: post })),
+          { type: "output", content: "─────────────────────────────────────" },
+          {
+            type: "output",
+            content: "Use 'blog read <number>' to read a post",
+          },
+          { type: "output", content: "" },
+        ]);
+      },
+    },
+    read: {
+      description: "Read a blog post",
+      hidden: true,
+      action: () => {
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: "error",
+            content: "Usage: blog read <post-number>",
+          },
+        ]);
+      },
+    },
   };
 
   // Autocomplete functionality
@@ -669,6 +719,70 @@ const BrutalistTerminal = () => {
           },
         ]);
       }
+      return;
+    }
+
+    // Handle blog read <number> command
+    if (commandName === "blog" && args.length > 0 && args[0] === "read") {
+      const postNumber = parseInt(args[1]);
+      const sortedPosts = blogPosts.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+
+      if (
+        isNaN(postNumber) ||
+        postNumber < 1 ||
+        postNumber > sortedPosts.length
+      ) {
+        playSound("error");
+        setHistory((prev) => [
+          ...prev,
+          {
+            type: "error",
+            content: `Invalid post number. Use 'blog' to list all posts.`,
+          },
+        ]);
+        return;
+      }
+
+      const post = sortedPosts[postNumber - 1];
+      const date = new Date(post.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      // Display blog post content in terminal
+      const contentLines = post.content.split("\n");
+      playSound("success");
+      setHistory((prev) => [
+        ...prev,
+        { type: "output", content: "" },
+        { type: "success", content: `📝 ${post.title}` },
+        {
+          type: "output",
+          content: `📅 ${date} • ⏱️ ${post.readTime} min read`,
+        },
+        { type: "output", content: "─────────────────────────────────────" },
+        ...contentLines.map((line) => ({
+          type: "output" as const,
+          content: line,
+        })),
+        { type: "output", content: "─────────────────────────────────────" },
+        {
+          type: "output",
+          content: `Tags: ${post.tags.map((t) => "#" + t).join(" ")}`,
+        },
+        ...(post.mediumUrl
+          ? [
+              {
+                type: "output" as const,
+                content: `📰 Read on Medium: ${post.mediumUrl}`,
+              },
+            ]
+          : []),
+        { type: "output", content: "" },
+      ]);
       return;
     }
 

@@ -19,7 +19,8 @@ A fully functional brutalist terminal with:
 - **Sound Effects**: Toggleable typing, success, and error sounds (Web Audio API)
 - **Tab Autocomplete**: Ghost text suggestions with Tab key completion
 - **Command History**: Navigate with ↑/↓ arrow keys
-- **14+ Commands**: Help, clear, about, contact, skills, and more
+- **16+ Commands**: Help, clear, about, contact, skills, blog, and more
+- **Blog Integration**: Read full blog posts in terminal
 - **Easter Eggs**: Hidden commands like sudo, hack, matrix, konami, fortune
 - **Unix Aliases**: ls, whoami, pwd, cat with file system simulation
 
@@ -28,6 +29,8 @@ A fully functional brutalist terminal with:
 - `about` - Display about section
 - `contact` - Show contact information
 - `skills` - List technical skills
+- `blog` - List all blog posts
+- `blog read <#>` - Read a specific blog post in terminal
 - `clear` - Clear terminal screen
 - `cat <file>` - Display file contents (skills.txt, about.md, contact.txt)
 - `ls` - List directory contents
@@ -40,6 +43,14 @@ A fully functional brutalist terminal with:
 - `matrix` - Enter the Matrix
 - `konami` - Classic cheat code
 - `fortune` - Random developer wisdom
+
+### 📝 Blog Integration
+- **Terminal-style blog reader**: Read full posts with `blog read <number>`
+- **Latest posts section**: Shows 3 most recent posts on main page
+- **Markdown content**: Write posts in markdown format
+- **Medium integration**: Optional links to Medium posts
+- **Tag system**: Organize posts by topics
+- **Mobile-friendly**: Blog shortcut in custom mobile keyboard
 
 ### 🎮 Interactive Mini-Games (Draggable Windows)
 

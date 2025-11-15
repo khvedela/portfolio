@@ -1,12 +1,15 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { blogPosts } from "@/blog/posts";
 import CVHeader from "@/components/CVHeader";
 import CVAbout from "@/components/CVAbout";
 import CVCaseStudies from "@/components/CVCaseStudies";
 import CVTechStack from "@/components/CVTechStack";
 import CVEducation from "@/components/CVEducation";
 import CVLanguages from "@/components/CVLanguages";
+import CVBlog from "@/components/CVBlog";
 import CustomCursor from "@/components/CustomCursor";
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
@@ -60,13 +63,65 @@ const Index = () => {
           {/* Brutalist progress bar */}
           <BrutalistProgressBar />
 
-          {/* Theme toggle button - brutalist style */}
+          {/* Fixed action buttons - top right */}
           <motion.div
-            className="no-print fixed top-6 right-6 z-50"
+            className="no-print fixed top-6 right-6 z-50 flex flex-col gap-3"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
+            {/* Blog button */}
+            <Link to="/blog">
+              <motion.button
+                className="w-14 h-14 bg-primary text-primary-foreground border-3 border-foreground hover:bg-foreground hover:text-background transition-colors flex items-center justify-center font-bold relative group"
+                aria-label="View blog"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                  type: "spring" as const,
+                  stiffness: 300,
+                  damping: 20,
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                </svg>
+                {/* New badge indicator */}
+                <motion.div
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-accent border-2 border-foreground flex items-center justify-center text-[10px] font-bold"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  {blogPosts.length}
+                </motion.div>
+                {/* Tooltip */}
+                <motion.div
+                  className="absolute right-full mr-3 bg-foreground text-background px-3 py-2 text-sm font-mono whitespace-nowrap border-3 border-foreground opacity-0 group-hover:opacity-100 pointer-events-none"
+                  initial={{ x: 10 }}
+                  whileHover={{ x: 0 }}
+                >
+                  READ BLOG
+                </motion.div>
+              </motion.button>
+            </Link>
+
+            {/* Theme toggle button */}
             <motion.button
               onClick={toggleTheme}
               className="w-14 h-14 bg-foreground text-background border-3 border-foreground hover:bg-background hover:text-foreground transition-colors flex items-center justify-center font-bold"
@@ -93,6 +148,7 @@ const Index = () => {
               <CVAbout />
               <CVCaseStudies />
               <CVTechStack />
+              <CVBlog />
               <CVEducation />
               <CVLanguages />
             </div>
