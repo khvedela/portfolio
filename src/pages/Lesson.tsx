@@ -397,47 +397,47 @@ const Lesson = () => {
 
         {/* Header */}
         <motion.header
-          className="bg-foreground text-background py-8 px-6 border-b-4 border-accent sticky top-2 z-40"
+          className="bg-foreground text-background py-4 md:py-8 px-4 md:px-6 border-b-4 border-accent sticky top-2 z-40"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           role="banner"
         >
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               {/* Breadcrumbs */}
               <nav
                 aria-label="Breadcrumb"
-                className="flex items-center gap-2 text-sm font-mono"
+                className="flex items-center gap-2 text-xs sm:text-sm font-mono overflow-x-auto scrollbar-hide"
               >
                 <Link
                   to="/"
-                  className="hover:text-accent transition-colors flex items-center gap-1"
+                  className="hover:text-accent transition-colors flex items-center gap-1 flex-shrink-0"
                 >
-                  <Home size={16} />
+                  <Home size={14} className="sm:w-4 sm:h-4" />
                 </Link>
-                <span>/</span>
+                <span className="flex-shrink-0">/</span>
                 <Link
                   to="/courses"
-                  className="hover:text-accent transition-colors"
+                  className="hover:text-accent transition-colors flex-shrink-0"
                 >
                   Courses
                 </Link>
-                <span>/</span>
+                <span className="flex-shrink-0">/</span>
                 <Link
                   to={`/courses/${courseId}`}
-                  className="hover:text-accent transition-colors truncate max-w-[200px]"
+                  className="hover:text-accent transition-colors truncate max-w-[120px] sm:max-w-[200px]"
                 >
                   {course.title}
                 </Link>
               </nav>
 
               {/* Completion Checkbox */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <motion.button
                   onClick={handleMarkComplete}
                   disabled={!allExercisesCompleted && !lessonCompleted}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 font-mono font-bold text-sm transition-colors ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 border-2 font-mono font-bold text-xs sm:text-sm transition-colors ${
                     lessonCompleted
                       ? "border-green-500 bg-green-500 text-white"
                       : !allExercisesCompleted
@@ -460,14 +460,19 @@ const Lesson = () => {
                       : ""
                   }
                 >
-                  <CheckCircle2 size={18} />
-                  {lessonCompleted ? "Completed" : "Mark Complete"}
+                  <CheckCircle2 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span className="hidden xs:inline">
+                    {lessonCompleted ? "Completed" : "Mark Complete"}
+                  </span>
+                  <span className="xs:hidden">
+                    {lessonCompleted ? "✓" : "Complete"}
+                  </span>
                 </motion.button>
                 {!allExercisesCompleted &&
                   !lessonCompleted &&
                   lesson?.exercises &&
                   lesson.exercises.length > 0 && (
-                    <span className="text-xs font-mono text-muted-foreground">
+                    <span className="hidden sm:inline text-xs font-mono text-muted-foreground">
                       Complete{" "}
                       {lesson.exercises.length - completedExercises.size}{" "}
                       exercise
@@ -481,11 +486,11 @@ const Lesson = () => {
             </div>
 
             {/* Lesson Title */}
-            <div className="mt-4">
-              <div className="text-sm font-mono mb-2 text-background/70">
+            <div className="mt-3 sm:mt-4">
+              <div className="text-xs sm:text-sm font-mono mb-1 sm:mb-2 text-background/70">
                 Lesson {lesson.order} of {course.lessons.length}
               </div>
-              <h1 className="text-2xl md:text-3xl font-display font-bold">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold">
                 {lesson.title}
               </h1>
             </div>
@@ -495,17 +500,17 @@ const Lesson = () => {
         {/* Main Content */}
         <main
           id="main-content"
-          className="max-w-5xl mx-auto px-6 py-12"
+          className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12"
           role="main"
         >
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
             {/* Lesson Navigation Sidebar */}
-            <aside className="lg:col-span-1">
+            <aside className="lg:col-span-1 order-2 lg:order-1">
               <div className="sticky top-[180px] max-h-[calc(100vh-200px)] overflow-y-auto">
-                <h3 className="font-bold text-sm mb-4 font-mono border-b-3 border-foreground pb-2">
+                <h3 className="font-bold text-xs sm:text-sm mb-3 sm:mb-4 font-mono border-b-2 sm:border-b-3 border-foreground pb-2">
                   LESSONS
                 </h3>
-                <nav className="space-y-2">
+                <nav className="space-y-1.5 sm:space-y-2">
                   {course.lessons
                     .sort((a, b) => a.order - b.order)
                     .map((l) => {
@@ -515,20 +520,20 @@ const Lesson = () => {
                         <Link
                           key={l.id}
                           to={`/courses/${course.id}/lessons/${l.id}`}
-                          className={`block text-sm font-mono p-2 border-l-3 transition-all ${
+                          className={`block text-xs sm:text-sm font-mono p-1.5 sm:p-2 border-l-2 sm:border-l-3 transition-all ${
                             isCurrent
                               ? "border-primary bg-primary/10 font-bold"
                               : "border-foreground/20 hover:border-primary hover:bg-primary/5"
                           }`}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
                             {completed ? (
                               <CheckCircle2
-                                size={14}
-                                className="text-primary"
+                                size={12}
+                                className="text-primary sm:w-3.5 sm:h-3.5"
                               />
                             ) : (
-                              <div className="w-3.5 h-3.5 border-2 border-foreground/30 rounded-full" />
+                              <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 border-2 border-foreground/30 rounded-full" />
                             )}
                             <span className="flex-1 truncate">{l.title}</span>
                           </div>
@@ -538,11 +543,11 @@ const Lesson = () => {
                 </nav>
 
                 {/* Course Progress */}
-                <div className="mt-6 pt-6 border-t-2 border-foreground/20">
-                  <div className="text-xs font-mono font-bold mb-2">
+                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 border-foreground/20">
+                  <div className="text-[10px] sm:text-xs font-mono font-bold mb-1.5 sm:mb-2">
                     COURSE PROGRESS
                   </div>
-                  <div className="text-xs font-mono text-muted-foreground">
+                  <div className="text-[10px] sm:text-xs font-mono text-muted-foreground">
                     {
                       course.lessons.filter((l) =>
                         isLessonComplete(course.id, l.id)
@@ -556,13 +561,13 @@ const Lesson = () => {
 
             {/* Lesson Content */}
             <motion.article
-              className="lg:col-span-3"
+              className="lg:col-span-3 order-1 lg:order-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
               {/* Markdown Content */}
-              <div className="prose prose-slate dark:prose-invert max-w-none mb-12">
+              <div className="prose prose-slate dark:prose-invert max-w-none prose-sm sm:prose-base mb-8 sm:mb-12">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={MarkdownComponents}
@@ -573,21 +578,21 @@ const Lesson = () => {
 
               {/* Exercises Section */}
               {lesson.exercises && lesson.exercises.length > 0 && (
-                <section className="mb-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-accent text-foreground flex items-center justify-center">
-                      <BookOpen size={24} />
+                <section className="mb-8 sm:mb-12">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent text-foreground flex items-center justify-center">
+                      <BookOpen size={20} className="sm:w-6 sm:h-6" />
                     </div>
-                    <h2 className="text-3xl font-display font-bold">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold">
                       Practice Exercises
                     </h2>
                   </div>
 
-                  <div className="space-y-8">
+                  <div className="space-y-6 sm:space-y-8">
                     {lesson.exercises.map((exercise, index) => (
                       <div key={exercise.id}>
-                        <div className="mb-3">
-                          <span className="text-sm font-mono font-bold text-muted-foreground">
+                        <div className="mb-2 sm:mb-3">
+                          <span className="text-xs sm:text-sm font-mono font-bold text-muted-foreground">
                             EXERCISE {index + 1} / {lesson.exercises.length}
                           </span>
                         </div>
@@ -621,20 +626,23 @@ const Lesson = () => {
               )}
 
               {/* Navigation */}
-              <div className="flex items-center justify-between gap-4 pt-8 border-t-4 border-foreground/20">
+              <div className="flex items-center justify-between gap-2 sm:gap-4 pt-6 sm:pt-8 border-t-3 sm:border-t-4 border-foreground/20">
                 {prevLesson ? (
                   <motion.button
                     onClick={handlePrevious}
-                    className="border-3 border-foreground bg-background text-foreground px-6 py-4 font-mono font-bold hover:bg-foreground hover:text-background transition-colors flex items-center gap-2"
+                    className="border-2 sm:border-3 border-foreground bg-background text-foreground px-3 sm:px-6 py-3 sm:py-4 font-mono font-bold hover:bg-foreground hover:text-background transition-colors flex items-center gap-1.5 sm:gap-2 min-h-[48px]"
                     whileHover={{ x: -4 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft
+                      size={18}
+                      className="sm:w-5 sm:h-5 flex-shrink-0"
+                    />
                     <div className="text-left">
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-[10px] sm:text-xs text-muted-foreground">
                         Previous
                       </div>
-                      <div className="truncate max-w-[200px]">
+                      <div className="truncate max-w-[100px] sm:max-w-[200px] text-xs sm:text-base">
                         {prevLesson.title}
                       </div>
                     </div>
@@ -646,26 +654,35 @@ const Lesson = () => {
                 {nextLesson ? (
                   <motion.button
                     onClick={handleNext}
-                    className="border-3 border-foreground bg-accent text-foreground px-6 py-4 font-mono font-bold hover:bg-foreground hover:text-background transition-colors flex items-center gap-2"
+                    className="border-2 sm:border-3 border-foreground bg-accent text-foreground px-3 sm:px-6 py-3 sm:py-4 font-mono font-bold hover:bg-foreground hover:text-background transition-colors flex items-center gap-1.5 sm:gap-2 min-h-[48px]"
                     whileHover={{ x: 4 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <div className="text-right">
-                      <div className="text-xs text-muted-foreground">Next</div>
-                      <div className="truncate max-w-[200px]">
+                      <div className="text-[10px] sm:text-xs text-muted-foreground">
+                        Next
+                      </div>
+                      <div className="truncate max-w-[100px] sm:max-w-[200px] text-xs sm:text-base">
                         {nextLesson.title}
                       </div>
                     </div>
-                    <ArrowRight size={20} />
+                    <ArrowRight
+                      size={18}
+                      className="sm:w-5 sm:h-5 flex-shrink-0"
+                    />
                   </motion.button>
                 ) : (
                   <motion.button
                     onClick={() => navigate(`/courses/${courseId}`)}
-                    className="border-3 border-primary bg-primary text-background px-6 py-4 font-mono font-bold hover:bg-background hover:text-primary transition-colors flex items-center gap-2"
+                    className="border-2 sm:border-3 border-primary bg-primary text-background px-3 sm:px-6 py-3 sm:py-4 font-mono font-bold hover:bg-background hover:text-primary transition-colors flex items-center gap-1.5 sm:gap-2 min-h-[48px] text-xs sm:text-base"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    🎉 Course Complete! View Certificate
+                    🎉{" "}
+                    <span className="hidden xs:inline">
+                      Course Complete! View Certificate
+                    </span>
+                    <span className="xs:hidden">Complete! Certificate</span>
                   </motion.button>
                 )}
               </div>
