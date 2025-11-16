@@ -125,7 +125,7 @@ const Lesson = () => {
       markLessonComplete(courseId, lessonId);
       setLessonCompleted(true);
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000);
+      setTimeout(() => setShowConfetti(false), 4000);
     }
   };
 
@@ -144,14 +144,26 @@ const Lesson = () => {
     ) || lesson?.exercises.length === 0;
 
   const handleNext = () => {
-    if (nextLesson && courseId) {
+    if (nextLesson && courseId && lessonId) {
+      // Auto-complete current lesson if all exercises are done
+      if (allExercisesCompleted && !lessonCompleted) {
+        markLessonComplete(courseId, lessonId);
+        setLessonCompleted(true);
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 4000);
+      }
       navigate(`/courses/${courseId}/lessons/${nextLesson.id}`);
       window.scrollTo(0, 0);
     }
   };
 
   const handlePrevious = () => {
-    if (prevLesson && courseId) {
+    if (prevLesson && courseId && lessonId) {
+      // Auto-complete current lesson if all exercises are done
+      if (allExercisesCompleted && !lessonCompleted) {
+        markLessonComplete(courseId, lessonId);
+        setLessonCompleted(true);
+      }
       navigate(`/courses/${courseId}/lessons/${prevLesson.id}`);
       window.scrollTo(0, 0);
     }
@@ -279,17 +291,20 @@ const Lesson = () => {
         <Confetti
           width={windowDimensions.width}
           height={windowDimensions.height}
-          recycle={false}
-          numberOfPieces={500}
+          recycle={true}
+          numberOfPieces={300}
+          gravity={0.3}
         />
       )}
 
       {/* Reading Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-2 bg-primary z-50 origin-left"
-        style={{ scaleX: readingProgress / 100 }}
-        initial={{ scaleX: 0 }}
-      />
+      <div className="fixed top-0 left-0 right-0 h-2 bg-muted z-50">
+        <motion.div
+          className="h-full bg-primary origin-left"
+          style={{ scaleX: readingProgress / 100 }}
+          initial={{ scaleX: 0 }}
+        />
+      </div>
 
       <div className="min-h-screen bg-background">
         {/* Theme toggle button - fixed top right */}
