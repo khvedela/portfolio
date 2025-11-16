@@ -9,7 +9,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-import { getPublishedCourses } from "@/courses/courses";
+import { getPublishedCourses, CourseCategory } from "@/courses/courses";
 import { Badge } from "@/components/ui/badge";
 import CustomCursor from "@/components/CustomCursor";
 import AchievementsBadge from "@/components/AchievementsBadge";
@@ -24,6 +24,15 @@ import { useState, useEffect } from "react";
 const CourseList = () => {
   const courses = getPublishedCourses();
   const [isDark, setIsDark] = useState(false);
+
+  // Group courses by category
+  const coursesByCategory = courses.reduce((acc, course) => {
+    if (!acc[course.category]) {
+      acc[course.category] = [];
+    }
+    acc[course.category].push(course);
+    return acc;
+  }, {} as Record<CourseCategory, typeof courses>);
 
   useEffect(() => {
     const prefersDark = window.matchMedia(
@@ -167,113 +176,140 @@ const CourseList = () => {
           initial="hidden"
           animate="visible"
         >
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course) => {
-              const progress = getCourseProgress(course.id);
-              const completionPercentage = getCourseCompletionPercentage(
-                course.id
-              );
-              const isStarted = progress.completedLessons.length > 0;
-              const isCompleted = completionPercentage === 100;
-
-              return (
-                <motion.article
-                  key={course.id}
-                  variants={courseVariants}
-                  className="border-4 border-foreground group hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all"
-                  whileHover={{ y: -4 }}
+          {/* Render courses grouped by category */}
+          {Object.entries(coursesByCategory).map(
+            ([category, categoryCourses]) => (
+              <div key={category} className="mb-16">
+                {/* Category Header */}
+                <motion.div
+                  className="mb-8"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <Link to={`/courses/${course.id}`}>
-                    {/* Course Header */}
-                    <div className="bg-foreground text-background p-6 border-b-4 border-foreground">
-                      <div className="flex items-start justify-between mb-3">
-                        <Badge
-                          className={`${getDifficultyColor(
-                            course.difficulty
-                          )} border-0 font-mono font-bold`}
-                        >
-                          {course.difficulty.toUpperCase()}
-                        </Badge>
-                        {isCompleted && (
-                          <Trophy size={24} className="text-yellow-400" />
-                        )}
-                      </div>
-                      <h2 className="text-2xl font-display font-bold mb-2 group-hover:text-accent transition-colors">
-                        {course.title}
-                      </h2>
-                    </div>
+                  <h2 className="text-3xl md:text-4xl font-display font-bold mb-2 flex items-center gap-3">
+                    <div className="w-2 h-12 bg-primary"></div>
+                    {category}
+                  </h2>
+                  <p className="text-muted-foreground font-mono ml-5">
+                    {categoryCourses.length} course
+                    {categoryCourses.length !== 1 ? "s" : ""}
+                  </p>
+                </motion.div>
 
-                    {/* Course Content */}
-                    <div className="p-6 bg-background">
-                      <p className="text-foreground/80 mb-4 leading-relaxed">
-                        {course.description}
-                      </p>
+                {/* Courses Grid */}
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  {categoryCourses.map((course) => {
+                    const progress = getCourseProgress(course.id);
+                    const completionPercentage = getCourseCompletionPercentage(
+                      course.id
+                    );
+                    const isStarted = progress.completedLessons.length > 0;
+                    const isCompleted = completionPercentage === 100;
 
-                      {/* Course Meta */}
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 font-mono">
-                        <div className="flex items-center gap-1">
-                          <BookOpen size={14} />
-                          <span>{course.lessons.length} lessons</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock size={14} />
-                          <span>{course.duration}h</span>
-                        </div>
-                      </div>
-
-                      {/* Progress Bar */}
-                      {isStarted && (
-                        <div className="mb-4">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs font-mono font-bold">
-                              PROGRESS
-                            </span>
-                            <span className="text-xs font-mono font-bold text-primary">
-                              {completionPercentage}%
-                            </span>
+                    return (
+                      <motion.article
+                        key={course.id}
+                        variants={courseVariants}
+                        className="border-4 border-foreground group hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all"
+                        whileHover={{ y: -4 }}
+                      >
+                        <Link to={`/courses/${course.id}`}>
+                          {/* Course Header */}
+                          <div className="bg-foreground text-background p-6 border-b-4 border-foreground">
+                            <div className="flex items-start justify-between mb-3">
+                              <Badge
+                                className={`${getDifficultyColor(
+                                  course.difficulty
+                                )} border-0 font-mono font-bold`}
+                              >
+                                {course.difficulty.toUpperCase()}
+                              </Badge>
+                              {isCompleted && (
+                                <Trophy size={24} className="text-yellow-400" />
+                              )}
+                            </div>
+                            <h2 className="text-2xl font-display font-bold mb-2 group-hover:text-accent transition-colors">
+                              {course.title}
+                            </h2>
                           </div>
-                          <div className="h-3 bg-muted border-2 border-foreground">
-                            <motion.div
-                              className="h-full bg-primary"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${completionPercentage}%` }}
-                              transition={{ duration: 0.5, delay: 0.2 }}
-                            />
+
+                          {/* Course Content */}
+                          <div className="p-6 bg-background">
+                            <p className="text-foreground/80 mb-4 leading-relaxed">
+                              {course.description}
+                            </p>
+
+                            {/* Course Meta */}
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 font-mono">
+                              <div className="flex items-center gap-1">
+                                <BookOpen size={14} />
+                                <span>{course.lessons.length} lessons</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Clock size={14} />
+                                <span>{course.duration}h</span>
+                              </div>
+                            </div>
+
+                            {/* Progress Bar */}
+                            {isStarted && (
+                              <div className="mb-4">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-xs font-mono font-bold">
+                                    PROGRESS
+                                  </span>
+                                  <span className="text-xs font-mono font-bold text-primary">
+                                    {completionPercentage}%
+                                  </span>
+                                </div>
+                                <div className="h-3 bg-muted border-2 border-foreground">
+                                  <motion.div
+                                    className="h-full bg-primary"
+                                    initial={{ width: 0 }}
+                                    animate={{
+                                      width: `${completionPercentage}%`,
+                                    }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {course.tags.slice(0, 3).map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  variant="outline"
+                                  className="border-2 border-foreground/20 font-mono text-xs"
+                                >
+                                  #{tag}
+                                </Badge>
+                              ))}
+                            </div>
+
+                            {/* CTA */}
+                            <div className="border-t-2 border-foreground/10 pt-4">
+                              <span className="inline-flex items-center gap-2 text-primary font-mono font-bold group-hover:gap-4 transition-all">
+                                {isCompleted ? (
+                                  <>Review Course →</>
+                                ) : isStarted ? (
+                                  <>Continue Learning →</>
+                                ) : (
+                                  <>Start Course →</>
+                                )}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      )}
-
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {course.tags.slice(0, 3).map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className="border-2 border-foreground/20 font-mono text-xs"
-                          >
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* CTA */}
-                      <div className="border-t-2 border-foreground/10 pt-4">
-                        <span className="inline-flex items-center gap-2 text-primary font-mono font-bold group-hover:gap-4 transition-all">
-                          {isCompleted ? (
-                            <>Review Course →</>
-                          ) : isStarted ? (
-                            <>Continue Learning →</>
-                          ) : (
-                            <>Start Course →</>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.article>
-              );
-            })}
-          </div>
+                        </Link>
+                      </motion.article>
+                    );
+                  })}
+                </div>
+              </div>
+            )
+          )}
 
           {courses.length === 0 && (
             <motion.div
