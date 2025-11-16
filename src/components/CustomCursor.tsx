@@ -9,8 +9,8 @@ const CustomCursor = () => {
   const cursorX = useMotionValue(0);
   const cursorY = useMotionValue(0);
 
-  // Spring physics for smooth following
-  const springConfig = { stiffness: 400, damping: 28, mass: 0.5 };
+  // Spring physics tuned for natural cursor speed - high stiffness, low damping
+  const springConfig = { stiffness: 1000, damping: 35, mass: 0.2 };
 
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
