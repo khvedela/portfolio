@@ -33,6 +33,18 @@ import {
 } from "@/lib/courseProgress";
 import ExerciseMultipleChoice from "@/components/ExerciseMultipleChoice";
 import ExerciseCodeChallenge from "@/components/ExerciseCodeChallenge";
+import AchievementToast from "@/components/AchievementToast";
+import {
+  checkAchievements,
+  checkTimeBasedAchievements,
+  ALL_ACHIEVEMENTS,
+  AchievementId,
+} from "@/lib/achievements";
+import {
+  trackLessonStart,
+  trackLessonComplete,
+  trackExerciseAttempt,
+} from "@/lib/analytics";
 
 const Lesson = () => {
   const { courseId, lessonId } = useParams<{
@@ -60,6 +72,9 @@ const Lesson = () => {
     height: 0,
   });
   const [isDark, setIsDark] = useState(false);
+  const [achievementQueue, setAchievementQueue] = useState<AchievementId[]>([]);
+  const [currentAchievement, setCurrentAchievement] =
+    useState<AchievementId | null>(null);
 
   useEffect(() => {
     setWindowDimensions({
@@ -91,10 +106,21 @@ const Lesson = () => {
     document.documentElement.classList.toggle("dark");
   };
 
+  // Handle achievement queue
+  useEffect(() => {
+    if (achievementQueue.length > 0 && !currentAchievement) {
+      setCurrentAchievement(achievementQueue[0]);
+      setAchievementQueue((prev) => prev.slice(1));
+    }
+  }, [achievementQueue, currentAchievement]);
+
   useEffect(() => {
     if (courseId && lessonId) {
       setCurrentLesson(courseId, lessonId);
       setLessonCompleted(isLessonComplete(courseId, lessonId));
+
+      // Track lesson start
+      trackLessonStart(courseId, lessonId);
 
       // Load already completed exercises
       if (lesson?.exercises) {
@@ -123,15 +149,26 @@ const Lesson = () => {
   const handleMarkComplete = () => {
     if (courseId && lessonId) {
       markLessonComplete(courseId, lessonId);
+      trackLessonComplete(courseId, lessonId);
       setLessonCompleted(true);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 4000);
+
+      // Check for achievements
+      const newAchievements = [
+        ...checkAchievements(),
+        ...checkTimeBasedAchievements(),
+      ];
+      if (newAchievements.length > 0) {
+        setAchievementQueue((prev) => [...prev, ...newAchievements]);
+      }
     }
   };
 
   const handleExerciseComplete = (exerciseId: string) => {
-    if (courseId) {
+    if (courseId && lessonId) {
       markExerciseComplete(courseId, exerciseId);
+      trackExerciseAttempt(courseId, lessonId, exerciseId, true);
       setCompletedExercises((prev) => new Set([...prev, exerciseId]));
     }
   };
@@ -148,9 +185,19 @@ const Lesson = () => {
       // Auto-complete current lesson if all exercises are done
       if (allExercisesCompleted && !lessonCompleted) {
         markLessonComplete(courseId, lessonId);
+        trackLessonComplete(courseId, lessonId);
         setLessonCompleted(true);
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 4000);
+
+        // Check for achievements
+        const newAchievements = [
+          ...checkAchievements(),
+          ...checkTimeBasedAchievements(),
+        ];
+        if (newAchievements.length > 0) {
+          setAchievementQueue((prev) => [...prev, ...newAchievements]);
+        }
       }
       navigate(`/courses/${courseId}/lessons/${nextLesson.id}`);
       window.scrollTo(0, 0);
@@ -162,7 +209,17 @@ const Lesson = () => {
       // Auto-complete current lesson if all exercises are done
       if (allExercisesCompleted && !lessonCompleted) {
         markLessonComplete(courseId, lessonId);
+        trackLessonComplete(courseId, lessonId);
         setLessonCompleted(true);
+
+        // Check for achievements
+        const newAchievements = [
+          ...checkAchievements(),
+          ...checkTimeBasedAchievements(),
+        ];
+        if (newAchievements.length > 0) {
+          setAchievementQueue((prev) => [...prev, ...newAchievements]);
+        }
       }
       navigate(`/courses/${courseId}/lessons/${prevLesson.id}`);
       window.scrollTo(0, 0);
@@ -286,6 +343,14 @@ const Lesson = () => {
 
       <CustomCursor />
 
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-foreground focus:text-background focus:px-4 focus:py-2 focus:font-mono focus:font-bold focus:border-3 focus:border-foreground"
+      >
+        Skip to main content
+      </a>
+
       {/* Confetti celebration */}
       {showConfetti && (
         <Confetti
@@ -336,11 +401,15 @@ const Lesson = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          role="banner"
         >
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between gap-4">
               {/* Breadcrumbs */}
-              <div className="flex items-center gap-2 text-sm font-mono">
+              <nav
+                aria-label="Breadcrumb"
+                className="flex items-center gap-2 text-sm font-mono"
+              >
                 <Link
                   to="/"
                   className="hover:text-accent transition-colors flex items-center gap-1"
@@ -361,7 +430,7 @@ const Lesson = () => {
                 >
                   {course.title}
                 </Link>
-              </div>
+              </nav>
 
               {/* Completion Checkbox */}
               <div className="flex items-center gap-3">
@@ -424,7 +493,11 @@ const Lesson = () => {
         </motion.header>
 
         {/* Main Content */}
-        <div className="max-w-5xl mx-auto px-6 py-12">
+        <main
+          id="main-content"
+          className="max-w-5xl mx-auto px-6 py-12"
+          role="main"
+        >
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Lesson Navigation Sidebar */}
             <aside className="lg:col-span-1">
@@ -598,7 +671,18 @@ const Lesson = () => {
               </div>
             </motion.article>
           </div>
-        </div>
+        </main>
+
+        {/* Achievement Toast */}
+        {currentAchievement && (
+          <AchievementToast
+            achievement={{
+              ...ALL_ACHIEVEMENTS[currentAchievement],
+              unlockedAt: new Date().toISOString(),
+            }}
+            onClose={() => setCurrentAchievement(null)}
+          />
+        )}
       </div>
     </>
   );

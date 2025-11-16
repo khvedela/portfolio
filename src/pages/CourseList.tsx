@@ -12,6 +12,8 @@ import {
 import { getPublishedCourses } from "@/courses/courses";
 import { Badge } from "@/components/ui/badge";
 import CustomCursor from "@/components/CustomCursor";
+import AchievementsBadge from "@/components/AchievementsBadge";
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Helmet } from "react-helmet-async";
 import {
   getCourseProgress,
@@ -285,12 +287,32 @@ const CourseList = () => {
             </motion.div>
           )}
 
+          {/* Achievements Section */}
+          <motion.section
+            className="mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <AchievementsBadge />
+          </motion.section>
+
+          {/* Analytics Dashboard */}
+          <motion.section
+            className="mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            <AnalyticsDashboard />
+          </motion.section>
+
           {/* Info Section */}
           <motion.section
             className="mt-16 border-4 border-foreground p-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.7 }}
           >
             <h2 className="text-2xl font-display font-bold mb-4 flex items-center gap-2">
               <BookOpen size={24} className="text-primary" />

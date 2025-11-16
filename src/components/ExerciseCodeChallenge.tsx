@@ -102,33 +102,35 @@ const ExerciseCodeChallenge = ({
 
   return (
     <motion.div
-      className="border-4 border-foreground p-6 bg-background"
+      className="border-4 border-foreground p-4 md:p-6 bg-background"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
       {/* Question */}
-      <div className="flex items-start gap-3 mb-6">
+      <div className="flex items-start gap-2 md:gap-3 mb-4 md:mb-6">
         <div className="w-8 h-8 bg-accent text-foreground flex items-center justify-center font-mono font-bold flex-shrink-0">
           <Code2 size={20} />
         </div>
         <div className="flex-1">
-          <p className="font-bold text-lg mb-2">{exercise.question}</p>
-          <div className="flex gap-3 mt-3">
+          <p className="font-bold text-base md:text-lg mb-2">
+            {exercise.question}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3">
             {exercise.hint && (
               <button
                 onClick={() => setShowHint(!showHint)}
-                className="text-sm font-mono text-primary hover:underline flex items-center gap-1"
+                className="text-sm font-mono text-primary hover:underline flex items-center gap-1 py-1 px-2 sm:p-0"
               >
-                <Lightbulb size={14} />
+                <Lightbulb size={16} />
                 {showHint ? "Hide hint" : "Show hint"}
               </button>
             )}
             <button
               onClick={() => setShowSolution(!showSolution)}
-              className="text-sm font-mono text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1"
+              className="text-sm font-mono text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1 py-1 px-2 sm:p-0"
             >
-              {showSolution ? <EyeOff size={14} /> : <Eye size={14} />}
+              {showSolution ? <EyeOff size={16} /> : <Eye size={16} />}
               {showSolution ? "Hide solution" : "Show solution"}
             </button>
           </div>
@@ -155,29 +157,41 @@ const ExerciseCodeChallenge = ({
       </AnimatePresence>
 
       {/* Code Editor */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-mono font-bold">YOUR CODE:</label>
+          <label
+            htmlFor="code-editor"
+            className="text-xs md:text-sm font-mono font-bold"
+          >
+            YOUR CODE:
+          </label>
           {userCode && (
-            <span className="text-xs font-mono text-muted-foreground">
+            <span
+              className="text-xs font-mono text-muted-foreground"
+              aria-live="polite"
+            >
               {userCode.split("\n").length} lines
             </span>
           )}
         </div>
-        <div className="border-3 border-foreground bg-[#1e1e1e] overflow-hidden">
+        <div
+          className="border-3 border-foreground bg-[#1e1e1e] overflow-hidden overflow-x-auto"
+          role="group"
+          aria-label="Code editor"
+        >
           <Editor
             value={userCode}
             onValueChange={setUserCode}
             highlight={(code) =>
               Prism.highlight(code, Prism.languages.markup, "markup")
             }
-            padding={16}
+            padding={12}
             placeholder="<!-- Write your HTML code here... -->"
             style={{
               fontFamily:
                 '"Fira Code", "JetBrains Mono", "Courier New", monospace',
-              fontSize: 14,
-              minHeight: "256px",
+              fontSize: 13,
+              minHeight: window.innerWidth < 768 ? "180px" : "256px",
               backgroundColor: "#1e1e1e",
               color: "#D4D4D4",
               caretColor: "#fff",
@@ -191,25 +205,25 @@ const ExerciseCodeChallenge = ({
       <AnimatePresence>
         {showSolution && (
           <motion.div
-            className="mb-6"
+            className="mb-4 md:mb-6"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
           >
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-mono font-bold text-primary">
+              <label className="text-xs md:text-sm font-mono font-bold text-primary">
                 SOLUTION:
               </label>
               <button
                 onClick={() => {
                   setUserCode(exercise.correctAnswer as string);
                 }}
-                className="text-xs font-mono text-primary hover:underline"
+                className="text-xs font-mono text-primary hover:underline py-1 px-2"
               >
                 Copy to editor
               </button>
             </div>
-            <div className="p-4 border-3 border-primary bg-[#1e1e1e] dark:bg-[#1e1e1e] font-mono text-sm overflow-x-auto [&_code]:text-[#D4D4D4]">
+            <div className="p-3 md:p-4 border-3 border-primary bg-[#1e1e1e] dark:bg-[#1e1e1e] font-mono text-xs md:text-sm overflow-x-auto [&_code]:text-[#D4D4D4]">
               <code
                 dangerouslySetInnerHTML={{
                   __html: Prism.highlight(
@@ -262,23 +276,32 @@ const ExerciseCodeChallenge = ({
       </AnimatePresence>
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div
+        className="flex flex-col sm:flex-row gap-3"
+        role="group"
+        aria-label="Exercise actions"
+      >
         {!submitted ? (
           <>
             <motion.button
               onClick={handleSubmit}
               disabled={!userCode.trim()}
-              className={`border-3 border-foreground font-mono font-bold px-6 py-3 transition-colors ${
+              className={`border-3 border-foreground font-mono font-bold px-4 md:px-6 py-3 transition-colors text-sm md:text-base focus:outline-none focus:ring-4 focus:ring-primary/50 ${
                 !userCode.trim()
                   ? "bg-muted text-muted-foreground cursor-not-allowed"
                   : "bg-foreground text-background hover:bg-background hover:text-foreground"
               }`}
               whileHover={userCode.trim() ? { scale: 1.02 } : {}}
               whileTap={userCode.trim() ? { scale: 0.98 } : {}}
+              aria-label="Submit your code solution"
+              aria-disabled={!userCode.trim()}
             >
               Submit Solution
             </motion.button>
-            <p className="text-xs text-muted-foreground flex items-center font-mono">
+            <p
+              className="text-xs text-muted-foreground flex items-center font-mono"
+              role="note"
+            >
               This is a self-assessed exercise. Compare your code with the
               solution.
             </p>
@@ -286,9 +309,10 @@ const ExerciseCodeChallenge = ({
         ) : (
           <motion.button
             onClick={handleReset}
-            className="border-3 border-foreground bg-background text-foreground font-mono font-bold px-6 py-3 hover:bg-foreground hover:text-background transition-colors"
+            className="border-3 border-foreground bg-background text-foreground font-mono font-bold px-4 md:px-6 py-3 hover:bg-foreground hover:text-background transition-colors text-sm md:text-base focus:outline-none focus:ring-4 focus:ring-primary/50"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            aria-label="Reset exercise and start over"
           >
             Reset Exercise
           </motion.button>
