@@ -63,6 +63,8 @@ const BlogPost = () => {
       const foundPost = getBlogPost(id);
       setPost(foundPost);
       setLoading(false);
+      // Scroll to top when navigating to a new post
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [id]);
 
@@ -76,6 +78,14 @@ const BlogPost = () => {
       setReadingProgress(Math.min(progress, 100));
 
       // Active heading detection
+      // If we're at the very bottom, always highlight the last heading
+      if (scrollTop + windowHeight >= documentHeight - 10) {
+        if (headings.length > 0) {
+          setActiveHeading(headings[headings.length - 1].id);
+        }
+        return;
+      }
+
       const headingElements = headings.map((h) =>
         document.getElementById(h.id)
       );

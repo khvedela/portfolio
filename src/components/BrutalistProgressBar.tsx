@@ -18,7 +18,8 @@ const BrutalistProgressBar = () => {
       { label: "TOP", id: "top", threshold: 0 },
       { label: "ABOUT", id: "about", threshold: 15 },
       { label: "WORK", id: "work", threshold: 35 },
-      { label: "TECH", id: "tech", threshold: 60 },
+      { label: "TECH", id: "tech", threshold: 50 },
+      { label: "BLOG", id: "blog", threshold: 65 },
       { label: "EDU", id: "education", threshold: 80 },
       { label: "END", id: "end", threshold: 95 },
     ],
@@ -37,13 +38,19 @@ const BrutalistProgressBar = () => {
     const updateCurrentSection = () => {
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // If we're at the very bottom, always show the last section
+      if (scrollPosition + windowHeight >= documentHeight - 10) {
+        setCurrentSectionIndex(sections.length - 1);
+        return;
+      }
 
       // Get all section elements
       const sectionElements = sections
         .map((s) => {
           if (s.id === "top") return { id: s.id, top: 0 };
-          if (s.id === "end")
-            return { id: s.id, top: document.documentElement.scrollHeight };
+          if (s.id === "end") return { id: s.id, top: documentHeight };
           const el = document.querySelector(`[data-section="${s.id}"]`);
           return el
             ? { id: s.id, top: el.getBoundingClientRect().top + scrollPosition }
