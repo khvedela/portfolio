@@ -14,6 +14,7 @@ import CustomCursor from "@/components/CustomCursor";
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
 import BrutalistTerminal from "@/components/BrutalistTerminal";
+import CommandMenu from "@/components/CommandMenu";
 
 const Index = () => {
   const [isDark, setIsDark] = useState(false);
@@ -47,6 +48,9 @@ const Index = () => {
       {/* Brutalist Terminal - toggleable with 't' key */}
       <BrutalistTerminal />
 
+      {/* Command Menu - fixed position */}
+      <CommandMenu isDark={isDark} onToggleTheme={toggleTheme} />
+
       {/* Show only loading screen if it hasn't been dismissed */}
       <AnimatePresence mode="wait">
         {showLoading && (
@@ -62,134 +66,6 @@ const Index = () => {
         <div className="min-h-screen bg-background transition-colors duration-200">
           {/* Brutalist progress bar */}
           <BrutalistProgressBar />
-
-          {/* Fixed action buttons - top right */}
-          <motion.div
-            className="no-print fixed top-6 right-6 z-50 flex flex-col gap-3"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            {/* Courses button */}
-            <Link to="/courses">
-              <motion.button
-                className="w-14 h-14 bg-accent text-foreground border-3 border-foreground hover:bg-foreground hover:text-background transition-colors flex items-center justify-center font-bold relative group"
-                aria-label="View free courses"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{
-                  type: "spring" as const,
-                  stiffness: 300,
-                  damping: 20,
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
-                  <path d="M22 10v6" />
-                  <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
-                </svg>
-                {/* FREE badge */}
-                <motion.div
-                  className="absolute -top-1 -right-1 bg-green-500 text-white border-2 border-foreground px-1.5 py-0.5 text-[9px] font-bold"
-                  animate={{
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  FREE
-                </motion.div>
-                {/* Tooltip */}
-                <motion.div
-                  className="absolute right-full mr-3 bg-foreground text-background px-3 py-2 text-sm font-mono whitespace-nowrap border-3 border-foreground opacity-0 group-hover:opacity-100 pointer-events-none"
-                  initial={{ x: 10 }}
-                  whileHover={{ x: 0 }}
-                >
-                  FREE COURSES
-                </motion.div>
-              </motion.button>
-            </Link>
-
-            {/* Blog button */}
-            <Link to="/blog">
-              <motion.button
-                className="w-14 h-14 bg-primary text-primary-foreground border-3 border-foreground hover:bg-foreground hover:text-background transition-colors flex items-center justify-center font-bold relative group"
-                aria-label="View blog"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{
-                  type: "spring" as const,
-                  stiffness: 300,
-                  damping: 20,
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-                </svg>
-                {/* New badge indicator */}
-                <motion.div
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-accent border-2 border-foreground flex items-center justify-center text-[10px] font-bold"
-                  animate={{
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  {blogPosts.length}
-                </motion.div>
-                {/* Tooltip */}
-                <motion.div
-                  className="absolute right-full mr-3 bg-foreground text-background px-3 py-2 text-sm font-mono whitespace-nowrap border-3 border-foreground opacity-0 group-hover:opacity-100 pointer-events-none"
-                  initial={{ x: 10 }}
-                  whileHover={{ x: 0 }}
-                >
-                  READ BLOG
-                </motion.div>
-              </motion.button>
-            </Link>
-
-            {/* Theme toggle button */}
-            <motion.button
-              onClick={toggleTheme}
-              className="w-14 h-14 bg-foreground text-background border-3 border-foreground hover:bg-background hover:text-foreground transition-colors flex items-center justify-center font-bold"
-              aria-label="Toggle theme"
-              whileHover={{ scale: 1.05, rotate: 180 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{
-                type: "spring" as const,
-                stiffness: 300,
-                damping: 20,
-              }}
-            >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </motion.button>
-          </motion.div>
 
           <CVHeader />
 
