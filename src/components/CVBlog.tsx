@@ -107,10 +107,6 @@ const CVBlog = () => {
 
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
                 <div className="flex items-center gap-1">
-                  <Calendar size={14} />
-                  <span>{formatDate(post.date)}</span>
-                </div>
-                <div className="flex items-center gap-1">
                   <Clock size={14} />
                   <span>{post.readTime} min read</span>
                 </div>
