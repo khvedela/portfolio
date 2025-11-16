@@ -159,14 +159,6 @@ const CVHeader = () => {
               color: "accent",
               copyable: false,
             },
-            {
-              icon: Github,
-              text: "github.com/khvedela",
-              copyText: "https://github.com/khvedela",
-              href: "https://github.com/khvedela",
-              color: "accent",
-              copyable: false,
-            },
           ].map((contact, index) => {
             const Icon = contact.icon;
 
