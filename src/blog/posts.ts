@@ -2,6 +2,7 @@
 import angularPerformanceContent from "./angular-performance-optimization.md?raw";
 import whyAngularContent from "./why-angular-for-enterprise.md?raw";
 import bankingUIsContent from "./building-banking-uis.md?raw";
+import angularSignalFormsContent from "./angular-signal-forms.md?raw";
 
 export interface BlogPost {
   id: string;
@@ -15,6 +16,17 @@ export interface BlogPost {
 }
 
 export const blogPosts: BlogPost[] = [
+  {
+    id: "angular-signal-forms",
+    title: "First Look: Angular Signal Forms",
+    date: "2025-11-19",
+    tags: ["angular", "signals", "forms"],
+    excerpt:
+      "Say goodbye to boilerplate. A deep dive into Angular's new Signal Forms with comparison tables, real-world patterns, and live examples. Learn when to use them—and when not to.",
+    readTime: 12,
+    mediumUrl: "",
+    content: angularSignalFormsContent,
+  },
   {
     id: "angular-performance-optimization",
     title: "40% Faster: How I Optimized Our Angular Banking App",

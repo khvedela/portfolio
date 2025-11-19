@@ -18,6 +18,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import CustomCursor from "@/components/CustomCursor";
 import BrutalistTerminal from "@/components/BrutalistTerminal";
+import MarkdownCallout from "@/components/MarkdownCallout";
+import CodeBlockWithCopy from "@/components/CodeBlockWithCopy";
+import AuthorBio from "@/components/AuthorBio";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -161,16 +164,19 @@ const BlogPost = () => {
   const MarkdownComponents = {
     code({ node, inline, className, children, ...props }: any) {
       const match = /language-(\w+)/.exec(className || "");
+      const code = String(children).replace(/\n$/, "");
       return !inline && match ? (
-        <SyntaxHighlighter
-          style={vscDarkPlus}
-          language={match[1]}
-          PreTag="div"
-          className="rounded-none border-3 border-foreground/20 my-6"
-          {...props}
-        >
-          {String(children).replace(/\n$/, "")}
-        </SyntaxHighlighter>
+        <CodeBlockWithCopy code={code} language={match[1]}>
+          <SyntaxHighlighter
+            style={vscDarkPlus}
+            language={match[1]}
+            PreTag="div"
+            className="rounded-none border-3 border-foreground/20"
+            {...props}
+          >
+            {code}
+          </SyntaxHighlighter>
+        </CodeBlockWithCopy>
       ) : (
         <code
           className="bg-muted px-2 py-1 rounded-none font-mono text-sm border border-foreground/20"
@@ -243,6 +249,24 @@ const BlogPost = () => {
       );
     },
     blockquote({ children, ...props }: any) {
+      // Parse blockquote content to detect callout types
+      const content = String(children);
+      
+      // Check for callout markers
+      if (content.includes("💡 TIP") || content.includes("**💡 TIP**")) {
+        return <MarkdownCallout type="tip">{children}</MarkdownCallout>;
+      }
+      if (content.includes("⚠️ WARNING") || content.includes("**⚠️ WARNING**")) {
+        return <MarkdownCallout type="warning">{children}</MarkdownCallout>;
+      }
+      if (content.includes("💡 KEY TAKEAWAYS") || content.includes("**💡 KEY TAKEAWAYS**")) {
+        return <MarkdownCallout type="info">{children}</MarkdownCallout>;
+      }
+      if (content.includes("📝 NOTE") || content.includes("**📝 NOTE**")) {
+        return <MarkdownCallout type="note">{children}</MarkdownCallout>;
+      }
+      
+      // Default blockquote styling
       return (
         <blockquote
           className="border-l-6 border-accent pl-6 italic my-6 text-muted-foreground"
@@ -465,6 +489,9 @@ const BlogPost = () => {
                 {post.content}
               </ReactMarkdown>
             </div>
+
+            {/* Author Bio */}
+            <AuthorBio />
 
             {/* Social Share Buttons - Mobile */}
             <div className="lg:hidden mt-12 pt-8 border-t-3 border-foreground/20">
