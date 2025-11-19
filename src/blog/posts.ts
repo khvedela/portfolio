@@ -3,6 +3,7 @@ import angularPerformanceContent from "./angular-performance-optimization.md?raw
 import whyAngularContent from "./why-angular-for-enterprise.md?raw";
 import bankingUIsContent from "./building-banking-uis.md?raw";
 import angularSignalFormsContent from "./angular-signal-forms.md?raw";
+import angularAriaContent from "./angular-aria-deep-dive.md?raw";
 
 export interface BlogPost {
   id: string;
@@ -16,6 +17,17 @@ export interface BlogPost {
 }
 
 export const blogPosts: BlogPost[] = [
+  {
+    id: "angular-aria-deep-dive",
+    title: "Angular ARIA: Building Accessible Components Without Losing Your Mind",
+    date: "2025-11-19",
+    tags: ["angular", "accessibility", "aria", "a11y"],
+    excerpt:
+      "A deep dive into Angular ARIA—the headless, accessible directives that handle keyboard navigation, focus management, and screen reader support. Build WCAG-compliant components with full styling control.",
+    readTime: 10,
+    mediumUrl: "",
+    content: angularAriaContent,
+  },
   {
     id: "angular-signal-forms",
     title: "First Look: Angular Signal Forms",

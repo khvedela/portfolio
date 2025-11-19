@@ -17,7 +17,6 @@ Here is everything you need to know to master them.
 > - **Full type safety**: `form.settings.theme` is typed, no more `form.get('settings.theme')` type loss
 > - No more subscription management—reactivity is built-in via signals
 > - Validation is defined via schema functions, separate from the form structure
-> - **Try it now**: [Live StackBlitz Example →](https://stackblitz.com/edit/angular-signal-forms-demo)
 
 ## The Paradigm Shift: Model-First Architecture
 
@@ -349,15 +348,9 @@ If you're starting a new project on the latest Angular version, it's time to lea
 
 ---
 
-## Try It Yourself
+## Resources
 
-🚀 **Live Examples on StackBlitz:**
-- [Basic Login Form](https://stackblitz.com/edit/angular-signal-forms-basic)
-- [User Registration with Nested Objects](https://stackblitz.com/edit/angular-signal-forms-registration)
-- [Multi-Step Wizard Form](https://stackblitz.com/edit/angular-signal-forms-wizard)
-- [Dynamic Todo List (Array Pattern)](https://stackblitz.com/edit/angular-signal-forms-arrays)
-
-📖 **Official Resources:**
+📖 **Official Documentation:**
 - [Angular Signal Forms Documentation](https://next.angular.dev/essentials/signal-forms)
 - [Angular Signals Guide](https://angular.dev/guide/signals)
 - [GitHub: Signal Forms Source Code](https://github.com/angular/angular/tree/main/packages/forms)
