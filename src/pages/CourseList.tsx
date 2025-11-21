@@ -20,6 +20,7 @@ import {
   getCourseCompletionPercentage,
 } from "@/lib/courseProgress";
 import { useState, useEffect } from "react";
+import { getPortfolioUrl } from "@/lib/navigation";
 
 const CourseList = () => {
   const courses = getPublishedCourses();
@@ -136,13 +137,13 @@ const CourseList = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="max-w-6xl mx-auto">
-            <Link
-              to="/"
+            <a
+              href={getPortfolioUrl()}
               className="inline-flex items-center gap-2 text-background hover:text-accent transition-colors mb-6 font-mono"
             >
               <ArrowLeft size={20} />
               <span>Back to Portfolio</span>
-            </Link>
+            </a>
 
             <motion.div
               className="flex items-center gap-4 mb-4"

@@ -11,6 +11,7 @@ import BlogPost from "./pages/BlogPost";
 import CourseList from "./pages/CourseList";
 import CourseDetail from "./pages/CourseDetail";
 import Lesson from "./pages/Lesson";
+import SubdomainRedirect from "./components/SubdomainRedirect";
 
 const queryClient = new QueryClient();
 
@@ -53,13 +54,15 @@ const App = () => (
             {!isBlogHost && !isCoursesHost && (
               <>
                 <Route path="/" element={<Index />} />
-                <Route path="/blog" element={<BlogList />} />
-                <Route path="/blog/:id" element={<BlogPost />} />
-                <Route path="/courses" element={<CourseList />} />
-                <Route path="/courses/:id" element={<CourseDetail />} />
+                {/* Redirect /blog to blog subdomain */}
                 <Route
-                  path="/courses/:courseId/lessons/:lessonId"
-                  element={<Lesson />}
+                  path="/blog/*"
+                  element={<SubdomainRedirect subdomain="blog" />}
+                />
+                {/* Redirect /courses to courses subdomain */}
+                <Route
+                  path="/courses/*"
+                  element={<SubdomainRedirect subdomain="courses" />}
                 />
                 <Route path="*" element={<NotFound />} />
               </>
