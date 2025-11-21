@@ -2,7 +2,7 @@ import { Mail, Phone, Globe, Linkedin, Github, Copy } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useBrutalistToast } from "@/hooks/useBrutalistToast";
-import BrutalistToast from "./BrutalistToast";
+import BrutalistToast from "../BrutalistToast";
 
 const CVHeader = () => {
   const [hoveredIcon, setHoveredIcon] = useState<number | null>(null);
@@ -199,15 +199,12 @@ const CVHeader = () => {
                         copyToClipboard(contact.copyText, contact.text);
                       }
                     }}
-                    className={`w-12 h-12 flex items-center justify-center bg-${
-                      contact.color
-                    } text-foreground border-3 transition-all duration-200 shrink-0 border-${
-                      contact.color
-                    }/30 hover:border-background cursor-pointer ${
-                      hoveredIcon === index
+                    className={`w-12 h-12 flex items-center justify-center bg-${contact.color
+                      } text-foreground border-3 transition-all duration-200 shrink-0 border-${contact.color
+                      }/30 hover:border-background cursor-pointer ${hoveredIcon === index
                         ? "scale-125 shadow-[0_0_30px_rgba(0,200,255,0.6)]"
                         : ""
-                    }`}
+                      }`}
                     variants={contactVariants}
                     onMouseEnter={() => setHoveredIcon(index)}
                     onMouseLeave={() => setHoveredIcon(null)}
@@ -218,18 +215,18 @@ const CVHeader = () => {
                           hoveredIcon === index
                             ? 1.2
                             : contact.isEasterEgg
-                            ? [1, 1.1, 1]
-                            : 1,
+                              ? [1, 1.1, 1]
+                              : 1,
                         rotate: hoveredIcon === index ? [0, -5, 5, 0] : 0,
                       }}
                       transition={{
                         duration: 0.3,
                         scale: contact.isEasterEgg
                           ? {
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }
                           : undefined,
                         rotate: {
                           duration: 0.5,

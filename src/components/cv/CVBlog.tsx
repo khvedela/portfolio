@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getLatestPosts } from "@/blog/posts";
 import { getPublishedCourses } from "@/courses/courses";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 
 const CVBlog = () => {
   const latestPosts = getLatestPosts(3);
