@@ -30,7 +30,9 @@ import {
   isLessonComplete,
   markExerciseComplete,
   isExerciseComplete,
+  getCourseCompletionPercentage,
 } from "@/lib/courseProgress";
+import { getPortfolioUrl } from "@/lib/navigation";
 import ExerciseMultipleChoice from "@/components/ExerciseMultipleChoice";
 import ExerciseCodeChallenge from "@/components/ExerciseCodeChallenge";
 import AchievementToast from "@/components/AchievementToast";
@@ -234,7 +236,7 @@ const Lesson = () => {
           404 - Lesson Not Found
         </div>
         <Link
-          to="/courses"
+          to="/"
           className="border-3 border-foreground bg-foreground text-background px-6 py-3 font-mono font-bold hover:bg-background hover:text-foreground transition-colors"
         >
           ← Back to Courses
@@ -410,15 +412,15 @@ const Lesson = () => {
                 aria-label="Breadcrumb"
                 className="flex items-center gap-2 text-xs sm:text-sm font-mono overflow-x-auto scrollbar-hide"
               >
-                <Link
-                  to="/"
+                <a
+                  href={getPortfolioUrl()}
                   className="hover:text-accent transition-colors flex items-center gap-1 flex-shrink-0"
                 >
                   <Home size={14} className="sm:w-4 sm:h-4" />
-                </Link>
+                </a>
                 <span className="flex-shrink-0">/</span>
                 <Link
-                  to="/courses"
+                  to="/"
                   className="hover:text-accent transition-colors flex-shrink-0"
                 >
                   Courses
@@ -437,13 +439,12 @@ const Lesson = () => {
                 <motion.button
                   onClick={handleMarkComplete}
                   disabled={!allExercisesCompleted && !lessonCompleted}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 border-2 font-mono font-bold text-xs sm:text-sm transition-colors ${
-                    lessonCompleted
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 border-2 font-mono font-bold text-xs sm:text-sm transition-colors ${lessonCompleted
                       ? "border-green-500 bg-green-500 text-white"
                       : !allExercisesCompleted
-                      ? "border-muted bg-muted text-muted-foreground cursor-not-allowed"
-                      : "border-background bg-background text-foreground hover:bg-accent hover:text-background"
-                  }`}
+                        ? "border-muted bg-muted text-muted-foreground cursor-not-allowed"
+                        : "border-background bg-background text-foreground hover:bg-accent hover:text-background"
+                    }`}
                   whileHover={
                     allExercisesCompleted || lessonCompleted
                       ? { scale: 1.05 }
@@ -520,11 +521,10 @@ const Lesson = () => {
                         <Link
                           key={l.id}
                           to={`/courses/${course.id}/lessons/${l.id}`}
-                          className={`block text-xs sm:text-sm font-mono p-1.5 sm:p-2 border-l-2 sm:border-l-3 transition-all ${
-                            isCurrent
+                          className={`block text-xs sm:text-sm font-mono p-1.5 sm:p-2 border-l-2 sm:border-l-3 transition-all ${isCurrent
                               ? "border-primary bg-primary/10 font-bold"
                               : "border-foreground/20 hover:border-primary hover:bg-primary/5"
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-1.5 sm:gap-2">
                             {completed ? (
