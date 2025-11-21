@@ -2,9 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BlogList from "./pages/BlogList";
@@ -15,48 +14,10 @@ import Lesson from "./pages/Lesson";
 
 const queryClient = new QueryClient();
 
-const SubdomainRouter = () => {
-  const [subdomain, setSubdomain] = useState<string | null>(null);
-
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    // Extract subdomain (e.g., "blog" from "blog.devdavid.me")
-    const parts = hostname.split(".");
-
-    // Check if we have a subdomain (more than 2 parts for .me TLD)
-    if (parts.length > 2) {
-      const sub = parts[0];
-      if (sub === "blog" || sub === "courses") {
-        setSubdomain(sub);
-      }
-    }
-  }, []);
-
-  // If subdomain detected, redirect to appropriate route
-  if (subdomain === "blog") {
-    return <Navigate to="/blog" replace />;
-  }
-
-  if (subdomain === "courses") {
-    return <Navigate to="/courses" replace />;
-  }
-
-  return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/blog" element={<BlogList />} />
-      <Route path="/blog/:id" element={<BlogPost />} />
-      <Route path="/courses" element={<CourseList />} />
-      <Route path="/courses/:id" element={<CourseDetail />} />
-      <Route
-        path="/courses/:courseId/lessons/:lessonId"
-        element={<Lesson />}
-      />
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-};
+// Detect hostname once at app level
+const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+const isBlogHost = hostname.startsWith("blog.");
+const isCoursesHost = hostname.startsWith("courses.");
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -65,7 +26,45 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SubdomainRouter />
+          <Routes>
+            {/* Blog subdomain: blog.devdavid.me */}
+            {isBlogHost && (
+              <>
+                <Route path="/" element={<BlogList />} />
+                <Route path="/:id" element={<BlogPost />} />
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
+
+            {/* Courses subdomain: courses.devdavid.me */}
+            {isCoursesHost && (
+              <>
+                <Route path="/" element={<CourseList />} />
+                <Route path="/:id" element={<CourseDetail />} />
+                <Route
+                  path="/:courseId/lessons/:lessonId"
+                  element={<Lesson />}
+                />
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
+
+            {/* Main domain: devdavid.me or www.devdavid.me */}
+            {!isBlogHost && !isCoursesHost && (
+              <>
+                <Route path="/" element={<Index />} />
+                <Route path="/blog" element={<BlogList />} />
+                <Route path="/blog/:id" element={<BlogPost />} />
+                <Route path="/courses" element={<CourseList />} />
+                <Route path="/courses/:id" element={<CourseDetail />} />
+                <Route
+                  path="/courses/:courseId/lessons/:lessonId"
+                  element={<Lesson />}
+                />
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </HelmetProvider>
