@@ -31,8 +31,8 @@ const App = () => (
             {/* Blog subdomain: blog.devdavid.me */}
             {isBlogHost && (
               <>
-                <Route path="/" element={<BlogList />} />
-                <Route path="/:id" element={<BlogPost />} />
+                <Route path="/blog" element={<BlogList />} />
+                <Route path="/blog/:id" element={<BlogPost />} />
                 <Route path="*" element={<NotFound />} />
               </>
             )}
@@ -40,10 +40,10 @@ const App = () => (
             {/* Courses subdomain: courses.devdavid.me */}
             {isCoursesHost && (
               <>
-                <Route path="/" element={<CourseList />} />
-                <Route path="/:id" element={<CourseDetail />} />
+                <Route path="/courses" element={<CourseList />} />
+                <Route path="/courses/:id" element={<CourseDetail />} />
                 <Route
-                  path="/:courseId/lessons/:lessonId"
+                  path="/courses/:courseId/lessons/:lessonId"
                   element={<Lesson />}
                 />
                 <Route path="*" element={<NotFound />} />
