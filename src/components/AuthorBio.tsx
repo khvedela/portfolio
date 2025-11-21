@@ -19,7 +19,7 @@ const AuthorBio = () => {
 
           <div className="flex-1">
             <h3 className="text-2xl font-display font-bold mb-2">
-              David Khvedela
+              David Khvedelidze
             </h3>
             <p className="text-muted-foreground font-mono text-sm mb-4">
               Senior Frontend Engineer @ TBC Bank
