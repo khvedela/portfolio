@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Clock } from "lucide-react";
 import { blogPosts } from "@/blog/posts";
@@ -6,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import CustomCursor from "@/components/CustomCursor";
 import BrutalistTerminal from "@/components/BrutalistTerminal";
 import { Helmet } from "react-helmet-async";
+import { getPortfolioUrl } from "@/lib/navigation";
+import { Link } from "react-router-dom";
 
 const BlogList = () => {
   const sortedPosts = blogPosts.sort(
@@ -70,13 +71,13 @@ const BlogList = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="max-w-4xl mx-auto">
-            <Link
-              to="/"
+            <a
+              href={getPortfolioUrl()}
               className="inline-flex items-center gap-2 text-background hover:text-accent transition-colors mb-6 font-mono"
             >
               <ArrowLeft size={20} />
               <span>Back to Portfolio</span>
-            </Link>
+            </a>
 
             <motion.div
               className="flex items-center gap-4 mb-4"
