@@ -6,7 +6,7 @@ import {
   Target,
   Zap,
 } from "lucide-react";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 import { motion } from "framer-motion";
 
 const CVCaseStudies = () => {

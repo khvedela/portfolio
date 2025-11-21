@@ -1,15 +1,16 @@
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { blogPosts } from "@/blog/posts";
-import CVHeader from "@/components/CVHeader";
-import CVAbout from "@/components/CVAbout";
-import CVCaseStudies from "@/components/CVCaseStudies";
-import CVTechStack from "@/components/CVTechStack";
-import CVEducation from "@/components/CVEducation";
-import CVLanguages from "@/components/CVLanguages";
-import CVBlog from "@/components/CVBlog";
+
+const CVHeader = lazy(() => import("@/components/cv/CVHeader"));
+const CVAbout = lazy(() => import("@/components/cv/CVAbout"));
+const CVCaseStudies = lazy(() => import("@/components/cv/CVCaseStudies"));
+const CVTechStack = lazy(() => import("@/components/cv/CVTechStack"));
+const CVEducation = lazy(() => import("@/components/cv/CVEducation"));
+const CVLanguages = lazy(() => import("@/components/cv/CVLanguages"));
+const CVBlog = lazy(() => import("@/components/cv/CVBlog"));
 import CustomCursor from "@/components/CustomCursor";
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
@@ -67,21 +68,23 @@ const Index = () => {
           {/* Brutalist progress bar */}
           <BrutalistProgressBar />
 
-          <CVHeader />
+          <Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center font-mono">Loading...</div>}>
+            <CVHeader />
 
-          <main className="max-w-4xl mx-auto px-6 py-16 print:py-8 relative">
-            {/* Decorative grid background */}
-            <div className="absolute inset-0 bg-grid opacity-[0.02] pointer-events-none"></div>
+            <main className="max-w-4xl mx-auto px-6 py-16 print:py-8 relative">
+              {/* Decorative grid background */}
+              <div className="absolute inset-0 bg-grid opacity-[0.02] pointer-events-none"></div>
 
-            <div className="relative">
-              <CVAbout />
-              <CVCaseStudies />
-              <CVTechStack />
-              <CVBlog />
-              <CVEducation />
-              <CVLanguages />
-            </div>
-          </main>
+              <div className="relative">
+                <CVAbout />
+                <CVCaseStudies />
+                <CVTechStack />
+                <CVBlog />
+                <CVEducation />
+                <CVLanguages />
+              </div>
+            </main>
+          </Suspense>
 
           {/* Footer - brutalist */}
           <motion.footer
