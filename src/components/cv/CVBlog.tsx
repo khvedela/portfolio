@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { getLatestPosts } from "@/blog/posts";
 import { getPublishedCourses } from "@/courses/courses";
 import { Badge } from "../ui/badge";
+import { getBlogUrl, getCoursesUrl } from "@/lib/navigation";
 
 const CVBlog = () => {
   const latestPosts = getLatestPosts(3);
@@ -221,19 +222,19 @@ const CVBlog = () => {
         viewport={{ once: true }}
         transition={{ delay: 0.6 }}
       >
-        <Link
-          to="/blog"
+        <a
+          href={getBlogUrl()}
           className="border-3 border-foreground bg-foreground text-background px-6 py-3 font-mono font-bold hover:bg-background hover:text-foreground transition-colors inline-block"
         >
           View All Posts →
-        </Link>
+        </a>
         {courses.length > 0 && (
-          <Link
-            to="/courses"
+          <a
+            href={getCoursesUrl()}
             className="border-3 border-accent bg-accent text-foreground px-6 py-3 font-mono font-bold hover:bg-background hover:text-accent transition-colors inline-block"
           >
             Browse All Courses →
-          </Link>
+          </a>
         )}
         <p className="text-muted-foreground text-sm font-mono">
           or type <span className="text-primary font-bold">blog</span> in

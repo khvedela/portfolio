@@ -26,6 +26,7 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Helmet } from "react-helmet-async";
+import { getPortfolioUrl } from "@/lib/navigation";
 
 const BlogPost = () => {
   const { id } = useParams<{ id: string }>();
@@ -154,7 +155,7 @@ const BlogPost = () => {
           to="/"
           className="border-3 border-foreground bg-foreground text-background px-6 py-3 font-mono font-bold hover:bg-background hover:text-foreground transition-colors"
         >
-          ← Back to Home
+          ← Back to Blog
         </Link>
       </div>
     );
@@ -251,7 +252,7 @@ const BlogPost = () => {
     blockquote({ children, ...props }: any) {
       // Parse blockquote content to detect callout types
       const content = String(children);
-      
+
       // Check for callout markers
       if (content.includes("💡 TIP") || content.includes("**💡 TIP**")) {
         return <MarkdownCallout type="tip">{children}</MarkdownCallout>;
@@ -265,7 +266,7 @@ const BlogPost = () => {
       if (content.includes("📝 NOTE") || content.includes("**📝 NOTE**")) {
         return <MarkdownCallout type="note">{children}</MarkdownCallout>;
       }
-      
+
       // Default blockquote styling
       return (
         <blockquote
@@ -348,20 +349,20 @@ const BlogPost = () => {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
               <Link
-                to="/blog"
+                to="/"
                 className="inline-flex items-center gap-2 text-background hover:text-accent transition-colors font-mono"
               >
                 <ArrowLeft size={20} />
                 <span>Back to Blog</span>
               </Link>
               <span className="text-background/50">|</span>
-              <Link
-                to="/"
+              <a
+                href={getPortfolioUrl()}
                 className="inline-flex items-center gap-2 text-background hover:text-accent transition-colors font-mono"
               >
                 <ArrowLeft size={20} />
                 <span>Portfolio</span>
-              </Link>
+              </a>
             </div>
 
             <motion.h1
@@ -423,13 +424,11 @@ const BlogPost = () => {
                     <a
                       key={heading.id}
                       href={`#${heading.id}`}
-                      className={`block text-sm font-mono transition-colors ${
-                        heading.level === 2 ? "font-bold" : "ml-4"
-                      } ${
-                        activeHeading === heading.id
+                      className={`block text-sm font-mono transition-colors ${heading.level === 2 ? "font-bold" : "ml-4"
+                        } ${activeHeading === heading.id
                           ? "text-primary"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                       onClick={(e) => {
                         e.preventDefault();
                         document.getElementById(heading.id)?.scrollIntoView({
@@ -565,19 +564,19 @@ const BlogPost = () => {
               transition={{ delay: 0.5 }}
             >
               <Link
-                to="/blog"
+                to="/"
                 className="inline-flex items-center gap-2 border-3 border-foreground bg-foreground text-background px-6 py-3 font-mono font-bold hover:bg-background hover:text-foreground transition-colors"
               >
                 <ArrowLeft size={20} />
                 <span>Back to Blog</span>
               </Link>
-              <Link
-                to="/"
+              <a
+                href={getPortfolioUrl()}
                 className="inline-flex items-center gap-2 border-3 border-foreground bg-background text-foreground px-6 py-3 font-mono font-bold hover:bg-foreground hover:text-background transition-colors"
               >
                 <ArrowLeft size={20} />
                 <span>Portfolio</span>
-              </Link>
+              </a>
             </motion.div>
           </motion.article>
         </div>

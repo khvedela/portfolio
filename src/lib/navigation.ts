@@ -19,3 +19,29 @@ export const getPortfolioUrl = (): string => {
     // Otherwise use relative path
     return "/";
 };
+
+/**
+ * Get the URL for the blog
+ * Always returns the blog subdomain URL
+ */
+export const getBlogUrl = (): string => {
+    if (typeof window === "undefined") return "/blog";
+
+    const hostname = window.location.hostname;
+    const baseDomain = hostname.replace(/^(www\.|blog\.|courses\.)/, "");
+
+    return `${window.location.protocol}//blog.${baseDomain}`;
+};
+
+/**
+ * Get the URL for courses
+ * Always returns the courses subdomain URL
+ */
+export const getCoursesUrl = (): string => {
+    if (typeof window === "undefined") return "/courses";
+
+    const hostname = window.location.hostname;
+    const baseDomain = hostname.replace(/^(www\.|blog\.|courses\.)/, "");
+
+    return `${window.location.protocol}//courses.${baseDomain}`;
+};

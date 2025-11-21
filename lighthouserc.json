@@ -1,0 +1,15 @@
+{
+    "ci": {
+        "collect": {
+            "staticDistDir": "dist",
+            "url": [
+                "https://devdavid.me",
+                "https://blog.devdavid.me",
+                "https://courses.devdavid.me"
+            ]
+        },
+        "assert": {
+            "preset": "lighthouse:recommended"
+        }
+    }
+}

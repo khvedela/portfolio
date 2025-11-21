@@ -27,6 +27,7 @@ import {
   resetCourseProgress,
 } from "@/lib/courseProgress";
 import { useState, useEffect } from "react";
+import { getPortfolioUrl } from "@/lib/navigation";
 
 const CourseDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -67,7 +68,7 @@ const CourseDetail = () => {
           404 - Course Not Found
         </div>
         <Link
-          to="/courses"
+          to="/"
           className="border-3 border-foreground bg-foreground text-background px-6 py-3 font-mono font-bold hover:bg-background hover:text-foreground transition-colors"
         >
           ← Back to Courses
@@ -157,20 +158,20 @@ const CourseDetail = () => {
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
               <Link
-                to="/courses"
+                to="/"
                 className="inline-flex items-center gap-2 text-background hover:text-accent transition-colors font-mono"
               >
                 <ArrowLeft size={20} />
                 <span>All Courses</span>
               </Link>
               <span className="text-background/50">|</span>
-              <Link
-                to="/"
+              <a
+                href={getPortfolioUrl()}
                 className="inline-flex items-center gap-2 text-background hover:text-accent transition-colors font-mono"
               >
                 <ArrowLeft size={20} />
                 <span>Portfolio</span>
-              </Link>
+              </a>
             </div>
 
             <div className="flex items-start justify-between gap-6 mb-6">
@@ -230,8 +231,8 @@ const CourseDetail = () => {
                   {isCompleted
                     ? "Review Course"
                     : progress.completedLessons.length > 0
-                    ? "Continue"
-                    : "Start Course"}
+                      ? "Continue"
+                      : "Start Course"}
                 </motion.button>
 
                 {isCompleted && (
@@ -404,9 +405,8 @@ const CourseDetail = () => {
                     return (
                       <motion.div
                         key={lesson.id}
-                        className={`border-3 border-foreground group hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${
-                          completed ? "bg-primary/5" : "bg-background"
-                        }`}
+                        className={`border-3 border-foreground group hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${completed ? "bg-primary/5" : "bg-background"
+                          }`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 + index * 0.1 }}
