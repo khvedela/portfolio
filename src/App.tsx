@@ -90,7 +90,10 @@ const AppContent = () => {
     <>
       <LiveCodeBackground isMatrix={matrixMode} />
       <CustomCursor />
-      <BrutalistTerminal onOpenCommandMenu={() => setMenuOpen(true)} />
+      <BrutalistTerminal 
+        onOpenCommandMenu={() => setMenuOpen(true)} 
+        onNavigateToDesktop={() => navigate("/desktop")} 
+      />
       <CommandMenu 
         open={menuOpen} 
         setOpen={setMenuOpen}  

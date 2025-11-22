@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Terminal as TerminalIcon, Volume2, VolumeX, Command } from "lucide-react";
+import { X, Terminal as TerminalIcon, Volume2, VolumeX, Command, Monitor } from "lucide-react";
 import DraggableWindow from "./DraggableWindow";
 import { TerminalContent } from "./TerminalContent";
 
 interface BrutalistTerminalProps {
   onOpenCommandMenu?: () => void;
+  onNavigateToDesktop?: () => void;
 }
 
-const BrutalistTerminal = ({ onOpenCommandMenu }: BrutalistTerminalProps) => {
+const BrutalistTerminal = ({ onOpenCommandMenu, onNavigateToDesktop }: BrutalistTerminalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isBooting, setIsBooting] = useState(false);
   
@@ -28,7 +29,7 @@ const BrutalistTerminal = ({ onOpenCommandMenu }: BrutalistTerminalProps) => {
             onClick={() => setIsOpen(true)}
           >
             <TerminalIcon size={14} />
-            <span className="hidden lg:inline">Open Terminal</span>
+            <span className="hidden lg:inline">Terminal</span>
           </motion.button>
           
           {onOpenCommandMenu && (
@@ -38,6 +39,17 @@ const BrutalistTerminal = ({ onOpenCommandMenu }: BrutalistTerminalProps) => {
             >
               <Command size={14} />
               <span className="hidden lg:inline">⌘ K</span>
+            </motion.button>
+          )}
+
+          {onNavigateToDesktop && (
+            <motion.button
+              className="font-mono text-xs text-muted-foreground flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 border-2 border-foreground/20 cursor-pointer hover:bg-background/90 hover:border-foreground/40 active:scale-95 transition-all"
+              onClick={onNavigateToDesktop}
+            >
+              <Monitor size={14} />
+              <span className="hidden lg:inline">⌘ D</span>
+              <span className="lg:hidden">Desktop</span>
             </motion.button>
           )}
         </motion.div>
