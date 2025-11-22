@@ -11,22 +11,29 @@ interface DesktopIconProps {
   onDoubleClick: () => void;
   isSelected: boolean;
   onSelect: (id: string) => void;
+  isMobile?: boolean;
 }
 
-export const DesktopIcon = ({ id, label, icon: Icon, x, y, onDoubleClick, isSelected, onSelect }: DesktopIconProps) => {
+export const DesktopIcon = ({ id, label, icon: Icon, x, y, onDoubleClick, isSelected, onSelect, isMobile }: DesktopIconProps) => {
   return (
     <motion.div
-      drag
+      drag={!isMobile}
       dragMomentum={false}
       initial={{ x, y }}
       className={`absolute flex flex-col items-center gap-1 p-2 w-24 cursor-pointer group border border-transparent rounded ${isSelected ? "bg-blue-500/30 border-blue-400/50" : "hover:bg-white/5 hover:border-white/10"}`}
       onClick={(e) => { 
         e.stopPropagation(); 
-        onSelect(id);
+        if (isMobile) {
+          onDoubleClick();
+        } else {
+          onSelect(id);
+        }
       }}
       onDoubleClick={(e) => {
-        e.stopPropagation();
-        onDoubleClick();
+        if (!isMobile) {
+          e.stopPropagation();
+          onDoubleClick();
+        }
       }}
       onDragStart={() => onSelect(id)}
     >

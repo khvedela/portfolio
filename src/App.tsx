@@ -25,6 +25,8 @@ const queryClient = new QueryClient();
 const hostname = typeof window !== "undefined" ? window.location.hostname : "";
 const isBlogHost = hostname.startsWith("blog.");
 const isCoursesHost = hostname.startsWith("courses.");
+const isDesktopHost = hostname.startsWith("desktop.");
+const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
 
 const AppContent = () => {
   const navigate = useNavigate();
@@ -100,6 +102,14 @@ const AppContent = () => {
       <Sonner />
       
       <Routes>
+        {/* Desktop subdomain: desktop.devdavid.me */}
+        {isDesktopHost && (
+          <>
+            <Route path="/" element={<Desktop />} />
+            <Route path="*" element={<Desktop />} />
+          </>
+        )}
+
         {/* Blog subdomain: blog.devdavid.me */}
         {isBlogHost && (
           <>
@@ -123,20 +133,34 @@ const AppContent = () => {
         )}
 
         {/* Main domain: devdavid.me or www.devdavid.me */}
-        {!isBlogHost && !isCoursesHost && (
+        {!isBlogHost && !isCoursesHost && !isDesktopHost && (
           <>
             <Route path="/" element={<Index />} />
-            <Route path="/desktop" element={<Desktop />} />
-            {/* Redirect /blog to blog subdomain */}
-            <Route
-              path="/blog/*"
-              element={<SubdomainRedirect subdomain="blog" />}
-            />
-            {/* Redirect /courses to courses subdomain */}
-            <Route
-              path="/courses/*"
-              element={<SubdomainRedirect subdomain="courses" />}
-            />
+            
+            {/* Desktop: Localhost direct access or Redirect */}
+            <Route path="/desktop" element={isLocalhost ? <Desktop /> : <SubdomainRedirect subdomain="desktop" />} />
+
+            {/* Blog: Localhost routes or Redirect */}
+            {isLocalhost ? (
+                <>
+                    <Route path="/blog" element={<BlogList />} />
+                    <Route path="/blog/:id" element={<BlogPost />} />
+                </>
+            ) : (
+                <Route path="/blog/*" element={<SubdomainRedirect subdomain="blog" />} />
+            )}
+
+            {/* Courses: Localhost routes or Redirect */}
+            {isLocalhost ? (
+                <>
+                    <Route path="/courses" element={<CourseList />} />
+                    <Route path="/courses/:id" element={<CourseDetail />} />
+                    <Route path="/courses/:courseId/lessons/:lessonId" element={<Lesson />} />
+                </>
+            ) : (
+                <Route path="/courses/*" element={<SubdomainRedirect subdomain="courses" />} />
+            )}
+
             <Route path="*" element={<NotFound />} />
           </>
         )}

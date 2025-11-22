@@ -1,23 +1,24 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Power, Settings, Folder, Terminal, Globe, FileText, User, LogOut, Search } from "lucide-react";
+import { Folder, Terminal, FileText, Trash2, HardDrive, User, FileCode, Code2, Globe, Settings, Search, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 interface StartMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onLaunch: (appId: string) => void;
 }
 
-export const StartMenu = ({ isOpen, onClose }: StartMenuProps) => {
+export const StartMenu = ({ isOpen, onClose, onLaunch }: StartMenuProps) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
   const menuItems = [
-    { label: "Terminal", icon: Terminal, category: "System", action: () => console.log("Terminal") },
-    { label: "File Manager", icon: Folder, category: "System", action: () => console.log("Files") },
-    { label: "Web Browser", icon: Globe, category: "Internet", action: () => console.log("Browser") },
-    { label: "Text Editor", icon: FileText, category: "Accessories", action: () => console.log("Editor") },
-    { label: "Settings", icon: Settings, category: "System", action: () => console.log("Settings") },
+    { id: "terminal", label: "Terminal", icon: Terminal, category: "System" },
+    { id: "computer", label: "File Manager", icon: Folder, category: "System" },
+    { id: "browser", label: "Web Browser", icon: Globe, category: "Internet" },
+    { id: "editor", label: "Text Editor", icon: FileText, category: "Accessories" },
+    { id: "settings", label: "Settings", icon: Settings, category: "System" },
   ];
 
   const filteredItems = menuItems.filter(item => 
@@ -53,8 +54,8 @@ export const StartMenu = ({ isOpen, onClose }: StartMenuProps) => {
             <div className="text-xs font-bold text-gray-500 px-2 py-1 mb-1 uppercase tracking-wider">Applications</div>
             {filteredItems.map((item) => (
               <button
-                key={item.label}
-                onClick={() => { item.action(); onClose(); }}
+                key={item.id}
+                onClick={() => { onLaunch(item.id); onClose(); }}
                 className="w-full flex items-center gap-3 p-2 hover:bg-blue-600 hover:text-white rounded-md transition-colors text-sm group text-left"
               >
                 <item.icon size={18} className="text-gray-400 group-hover:text-white" />
