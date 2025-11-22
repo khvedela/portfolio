@@ -2,8 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Clock } from "lucide-react";
 import { blogPosts } from "@/blog/posts";
 import { Badge } from "@/components/ui/badge";
-import CustomCursor from "@/components/CustomCursor";
-import BrutalistTerminal from "@/components/BrutalistTerminal";
 import { Helmet } from "react-helmet-async";
 import { getPortfolioUrl } from "@/lib/navigation";
 import { Link } from "react-router-dom";
@@ -59,10 +57,8 @@ const BlogList = () => {
         />
       </Helmet>
 
-      <CustomCursor />
-      <BrutalistTerminal />
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Header */}
         <motion.header
           className="bg-foreground text-background py-16 px-6 border-b-6 border-accent"

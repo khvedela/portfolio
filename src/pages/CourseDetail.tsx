@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { getCourse } from "@/courses/courses";
 import { Badge } from "@/components/ui/badge";
-import CustomCursor from "@/components/CustomCursor";
 import CourseCertificate from "@/components/CourseCertificate";
 import { Helmet } from "react-helmet-async";
 import {
@@ -63,7 +62,6 @@ const CourseDetail = () => {
   if (!course) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center flex-col gap-4">
-        <CustomCursor />
         <div className="text-foreground font-mono text-xl">
           404 - Course Not Found
         </div>
@@ -122,9 +120,8 @@ const CourseDetail = () => {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <CustomCursor />
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Theme toggle button - fixed top right */}
         <motion.div
           className="fixed top-6 right-6 z-50"

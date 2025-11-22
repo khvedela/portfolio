@@ -17,8 +17,6 @@ import {
   getNextLesson,
   getPreviousLesson,
 } from "@/courses/courses";
-import CustomCursor from "@/components/CustomCursor";
-import BrutalistTerminal from "@/components/BrutalistTerminal";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -231,7 +229,6 @@ const Lesson = () => {
   if (!course || !lesson) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center flex-col gap-4">
-        <CustomCursor />
         <div className="text-foreground font-mono text-xl">
           404 - Lesson Not Found
         </div>
@@ -343,7 +340,6 @@ const Lesson = () => {
         />
       </Helmet>
 
-      <CustomCursor />
 
       {/* Skip to main content link for accessibility */}
       <a
@@ -373,7 +369,7 @@ const Lesson = () => {
         />
       </div>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Theme toggle button - fixed top right */}
         <motion.div
           className="fixed top-6 right-6 z-50"
