@@ -25,6 +25,18 @@ export const StartMenu = ({ isOpen, onClose, onLaunch }: StartMenuProps) => {
     item.label.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleLogOut = () => {
+    onClose();
+    if (window.location.hostname.startsWith("desktop.")) {
+        // Assuming the main domain is the hostname without the first subdomain part.
+        const rootDomain = window.location.hostname.split('.').slice(1).join('.');
+        window.location.href = `${window.location.protocol}//${rootDomain}`;
+    } else {
+        // Fallback for localhost or main domain access.
+        navigate("/");
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -76,7 +88,7 @@ export const StartMenu = ({ isOpen, onClose, onLaunch }: StartMenuProps) => {
               <span>Guest User</span>
             </div>
             <button
-              onClick={() => { onClose(); navigate("/"); }}
+              onClick={handleLogOut}
               className="p-2 hover:bg-white/10 rounded-md transition-colors text-gray-400 hover:text-white"
               title="Log Out"
             >
