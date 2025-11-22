@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, ReactNode } from "react";
 import { X, Maximize2, Minimize2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DraggableWindowProps {
   title: string;
@@ -14,22 +15,6 @@ interface DraggableWindowProps {
   onFocus?: () => void;
   variant?: "brutalist" | "linux";
 }
-
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  return isMobile;
-};
 
 const DraggableWindow = ({
   title,
@@ -137,8 +122,8 @@ const DraggableWindow = ({
       style={{
         left: isMaximized || isMobile ? 0 : position.x,
         top: isMaximized || isMobile ? 0 : position.y,
-        width: isMaximized || isMobile ? "100vw" : width,
-        height: isMaximized || isMobile ? "100vh" : height,
+        width: isMaximized || isMobile ? "100dvw" : width,
+        height: isMaximized || isMobile ? "100dvh" : height,
         transition: isMaximized ? "all 0.2s ease" : "none",
         zIndex: zIndex,
         display: isMinimized ? "none" : "flex",
