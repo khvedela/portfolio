@@ -17,7 +17,6 @@ import {
   getNextLesson,
   getPreviousLesson,
 } from "@/courses/courses";
-import CustomCursor from "@/components/CustomCursor";
 import BrutalistTerminal from "@/components/BrutalistTerminal";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -231,7 +230,6 @@ const Lesson = () => {
   if (!course || !lesson) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center flex-col gap-4">
-        <CustomCursor />
         <div className="text-foreground font-mono text-xl">
           404 - Lesson Not Found
         </div>
@@ -343,7 +341,6 @@ const Lesson = () => {
         />
       </Helmet>
 
-      <CustomCursor />
 
       {/* Skip to main content link for accessibility */}
       <a

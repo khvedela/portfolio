@@ -12,6 +12,7 @@ import CourseList from "./pages/CourseList";
 import CourseDetail from "./pages/CourseDetail";
 import Lesson from "./pages/Lesson";
 import SubdomainRedirect from "./components/SubdomainRedirect";
+import CustomCursor from "./components/CustomCursor";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
       <TooltipProvider>
+        <CustomCursor />
         <Toaster />
         <Sonner />
         <BrowserRouter>

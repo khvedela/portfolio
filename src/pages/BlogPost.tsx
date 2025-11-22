@@ -16,7 +16,6 @@ import {
   getPostsByTag,
 } from "@/blog/posts";
 import { Badge } from "@/components/ui/badge";
-import CustomCursor from "@/components/CustomCursor";
 import BrutalistTerminal from "@/components/BrutalistTerminal";
 import MarkdownCallout from "@/components/MarkdownCallout";
 import CodeBlockWithCopy from "@/components/CodeBlockWithCopy";
@@ -137,7 +136,6 @@ const BlogPost = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <CustomCursor />
         <div className="text-foreground font-mono">Loading...</div>
       </div>
     );
@@ -146,7 +144,6 @@ const BlogPost = () => {
   if (!post) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center flex-col gap-4">
-        <CustomCursor />
         <BrutalistTerminal />
         <div className="text-foreground font-mono text-xl">
           404 - Post Not Found
@@ -328,7 +325,6 @@ const BlogPost = () => {
         <meta name="author" content="David Khvedela" />
       </Helmet>
 
-      <CustomCursor />
       <BrutalistTerminal />
 
       {/* Reading Progress Bar */}

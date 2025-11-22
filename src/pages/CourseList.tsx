@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { getPublishedCourses, CourseCategory } from "@/courses/courses";
 import { Badge } from "@/components/ui/badge";
-import CustomCursor from "@/components/CustomCursor";
 import AchievementsBadge from "@/components/AchievementsBadge";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Helmet } from "react-helmet-async";
@@ -103,7 +102,6 @@ const CourseList = () => {
         <meta property="og:url" content={window.location.href} />
       </Helmet>
 
-      <CustomCursor />
 
       <div className="min-h-screen bg-background">
         {/* Theme toggle button - fixed top right */}

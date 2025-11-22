@@ -11,7 +11,6 @@ const CVTechStack = lazy(() => import("@/components/cv/CVTechStack"));
 const CVEducation = lazy(() => import("@/components/cv/CVEducation"));
 const CVLanguages = lazy(() => import("@/components/cv/CVLanguages"));
 const CVBlog = lazy(() => import("@/components/cv/CVBlog"));
-import CustomCursor from "@/components/CustomCursor";
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
 import BrutalistTerminal from "@/components/BrutalistTerminal";
@@ -43,8 +42,7 @@ const Index = () => {
 
   return (
     <>
-      {/* Custom cursor - always visible */}
-      <CustomCursor />
+      {/* Custom cursor - removed as it is now global */}
 
       {/* Brutalist Terminal - toggleable with 't' key */}
       <BrutalistTerminal />
