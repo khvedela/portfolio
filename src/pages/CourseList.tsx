@@ -103,7 +103,7 @@ const CourseList = () => {
       </Helmet>
 
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Theme toggle button - fixed top right */}
         <motion.div
           className="fixed top-6 right-6 z-50"

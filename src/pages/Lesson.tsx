@@ -17,7 +17,6 @@ import {
   getNextLesson,
   getPreviousLesson,
 } from "@/courses/courses";
-import BrutalistTerminal from "@/components/BrutalistTerminal";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -370,7 +369,7 @@ const Lesson = () => {
         />
       </div>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Theme toggle button - fixed top right */}
         <motion.div
           className="fixed top-6 right-6 z-50"

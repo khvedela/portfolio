@@ -13,8 +13,6 @@ const CVLanguages = lazy(() => import("@/components/cv/CVLanguages"));
 const CVBlog = lazy(() => import("@/components/cv/CVBlog"));
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
-import BrutalistTerminal from "@/components/BrutalistTerminal";
-import CommandMenu from "@/components/CommandMenu";
 
 const Index = () => {
   const [isDark, setIsDark] = useState(false);
@@ -44,11 +42,6 @@ const Index = () => {
     <>
       {/* Custom cursor - removed as it is now global */}
 
-      {/* Brutalist Terminal - toggleable with 't' key */}
-      <BrutalistTerminal />
-
-      {/* Command Menu - fixed position */}
-      <CommandMenu isDark={isDark} onToggleTheme={toggleTheme} />
 
       {/* Show only loading screen if it hasn't been dismissed */}
       <AnimatePresence mode="wait">
@@ -62,7 +55,7 @@ const Index = () => {
 
       {/* Only render main content after loading is complete */}
       {!showLoading && (
-        <div className="min-h-screen bg-background transition-colors duration-200">
+        <div className="min-h-screen transition-colors duration-200">
           {/* Brutalist progress bar */}
           <BrutalistProgressBar />
 

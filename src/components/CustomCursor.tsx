@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Maximize2, 
   Minimize2, 
@@ -36,6 +37,7 @@ type CursorType =
   | "none";
 
 const CustomCursor = () => {
+  const isMobile = useIsMobile();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [cursorType, setCursorType] = useState<CursorType>("default");
   const [isClicking, setIsClicking] = useState(false);
@@ -51,6 +53,8 @@ const CustomCursor = () => {
   }, [mousePosition]);
 
   useEffect(() => {
+    if (isMobile) return;
+
     let animationFrameId: number;
 
     const updateMousePosition = (e: MouseEvent) => {
@@ -175,9 +179,9 @@ const CustomCursor = () => {
       window.removeEventListener("mouseover", handleMouseOver);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isVisible]);
+  }, [isVisible, isMobile]);
 
-  if (!isVisible) return null;
+  if (!isVisible || isMobile) return null;
 
   const isWait = cursorType === "wait" || cursorType === "progress";
 
@@ -185,7 +189,7 @@ const CustomCursor = () => {
     <>
       {/* GHOST CURSOR (The trail) */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99998] opacity-30 mix-blend-difference"
+        className="fixed top-0 left-0 pointer-events-none z-[200000] opacity-30 mix-blend-difference"
         animate={{
           x: ghostPosition.x - 16,
           y: ghostPosition.y - 16,
@@ -199,7 +203,7 @@ const CustomCursor = () => {
 
       {/* MAIN HARDWARE CURSOR */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99999] mix-blend-difference"
+        className="fixed top-0 left-0 pointer-events-none z-[200001] mix-blend-difference"
         animate={{
           x: mousePosition.x - 16,
           y: mousePosition.y - 16,
@@ -378,7 +382,7 @@ const CustomCursor = () => {
 
       {/* COORDINATES LABEL - Improved Visibility */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99999] text-[9px] font-mono font-bold text-white whitespace-nowrap"
+        className="fixed top-0 left-0 pointer-events-none z-[200001] text-[9px] font-mono font-bold text-white whitespace-nowrap"
         animate={{
           x: mousePosition.x + 24,
           y: mousePosition.y + 24,

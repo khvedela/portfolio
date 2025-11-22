@@ -16,7 +16,6 @@ import {
   getPostsByTag,
 } from "@/blog/posts";
 import { Badge } from "@/components/ui/badge";
-import BrutalistTerminal from "@/components/BrutalistTerminal";
 import MarkdownCallout from "@/components/MarkdownCallout";
 import CodeBlockWithCopy from "@/components/CodeBlockWithCopy";
 import AuthorBio from "@/components/AuthorBio";
@@ -325,7 +324,6 @@ const BlogPost = () => {
         <meta name="author" content="David Khvedela" />
       </Helmet>
 
-      <BrutalistTerminal />
 
       {/* Reading Progress Bar */}
       <motion.div
@@ -334,7 +332,7 @@ const BlogPost = () => {
         initial={{ scaleX: 0 }}
       />
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         {/* Header */}
         <motion.header
           className="bg-foreground text-background py-12 px-6 border-b-6 border-accent"

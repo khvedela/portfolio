@@ -9,6 +9,10 @@ interface DraggableWindowProps {
   initialY?: number;
   width?: number;
   height?: number;
+  zIndex?: number;
+  isMinimized?: boolean;
+  onFocus?: () => void;
+  variant?: "brutalist" | "linux";
 }
 
 const useIsMobile = () => {
@@ -35,6 +39,10 @@ const DraggableWindow = ({
   initialY = 100,
   width = 400,
   height = 500,
+  zIndex = 10000,
+  isMinimized = false,
+  onFocus,
+  variant = "brutalist",
 }: DraggableWindowProps) => {
   const isMobile = useIsMobile();
   const [position, setPosition] = useState({ x: initialX, y: initialY });
@@ -115,50 +123,71 @@ const DraggableWindow = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile]);
 
+  const isLinux = variant === "linux";
+
   return (
     <div
       ref={windowRef}
-      className="fixed bg-background border-4 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] z-[10000]"
+      onMouseDownCapture={onFocus}
+      className={`fixed z-[10000] flex flex-col overflow-hidden ${
+        isLinux 
+          ? "bg-[#2d2d2d] border border-white/10 rounded-lg shadow-2xl text-white" 
+          : "bg-background border-4 border-foreground shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+      }`}
       style={{
         left: isMaximized || isMobile ? 0 : position.x,
         top: isMaximized || isMobile ? 0 : position.y,
         width: isMaximized || isMobile ? "100vw" : width,
         height: isMaximized || isMobile ? "100vh" : height,
         transition: isMaximized ? "all 0.2s ease" : "none",
+        zIndex: zIndex,
+        display: isMinimized ? "none" : "flex",
       }}
     >
       {/* Title Bar */}
       <div
-        className={`bg-primary text-primary-foreground px-3 py-2 flex items-center justify-between border-b-4 border-foreground select-none ${
-          isMobile ? "cursor-default" : "cursor-move"
-        }`}
+        className={`flex items-center justify-between select-none shrink-0 ${
+          isLinux 
+            ? "bg-[#3d3d3d] border-b border-white/10 px-4 py-2 rounded-t-lg" 
+            : "bg-primary text-primary-foreground px-3 py-2 border-b-4 border-foreground"
+        } ${isMobile ? "cursor-default" : "cursor-move"}`}
         onMouseDown={handleMouseDown}
       >
-        <span className="font-bold text-sm uppercase tracking-wider">
-          {title}
-        </span>
+        <div className="flex items-center gap-2">
+          {/* Linux: Icon could go here */}
+          <span className={`font-bold text-sm tracking-wider ${isLinux ? "font-sans text-gray-200" : "uppercase"}`}>
+            {title}
+          </span>
+        </div>
+        
         <div className="flex items-center gap-2">
           {!isMobile && (
             <button
               onClick={toggleMaximize}
-              className="hover:bg-foreground/20 p-1 transition-colors"
+              className={`transition-colors p-1 ${
+                isLinux ? "hover:bg-white/10 rounded-full" : "hover:bg-foreground/20"
+              }`}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             </button>
           )}
           <button
             onClick={onClose}
-            className="hover:bg-destructive p-1 transition-colors"
+            className={`transition-colors p-1 ${
+              isLinux ? "hover:bg-red-500/80 hover:text-white rounded-full" : "hover:bg-destructive"
+            }`}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="overflow-auto h-[calc(100%-44px)] p-4">{children}</div>
+      <div className={`overflow-auto flex-1 p-4 ${isLinux ? "bg-[#1e1e1e] text-gray-200" : ""}`}>
+        {children}
+      </div>
     </div>
   );
 };
