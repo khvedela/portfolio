@@ -4,6 +4,8 @@ import {
   Clock,
   ExternalLink,
   GraduationCap,
+  Radio,
+  Terminal
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -16,231 +18,113 @@ const CVBlog = () => {
   const latestPosts = getLatestPosts(3);
   const courses = getPublishedCourses();
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const postVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring" as const,
-        stiffness: 80,
-        damping: 12,
-      },
-    },
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   return (
-    <section className="mb-16 print-break-avoid" data-section="blog">
+    <section className="mb-20 print-break-avoid relative" data-section="blog">
       <motion.div
-        className="relative mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
       >
-        <div className="flex items-center gap-4 mb-2">
-          <motion.div
-            className="w-12 h-12 bg-foreground flex items-center justify-center"
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            transition={{ type: "spring" as const, stiffness: 300 }}
-          >
-            <BookOpen size={24} className="text-background" />
-          </motion.div>
-          <h2 className="text-4xl font-display">WRITING</h2>
+        <h2 className="text-4xl md:text-5xl font-display font-black uppercase tracking-tighter">
+          Data<span className="text-primary">_Transmissions</span>
+        </h2>
+        <div className="mb-2 text-xs font-mono text-muted-foreground hidden md:block">
+          // LATEST LOGS
         </div>
-        <motion.div
-          className="h-1 w-32 bg-accent ml-16"
-          initial={{ width: 0 }}
-          whileInView={{ width: "8rem" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        />
       </motion.div>
 
-      <motion.div
-        className="space-y-6"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-      >
+      <div className="space-y-4">
         {latestPosts.map((post, index) => (
           <motion.article
             key={post.id}
-            variants={postVariants}
-            className="border-l-6 border-primary pl-8 py-4 group cursor-pointer"
-            whileHover={{ x: 4 }}
-            transition={{
-              type: "spring" as const,
-              stiffness: 300,
-              damping: 20,
-            }}
+            className="relative border-l-4 border-foreground/20 hover:border-primary bg-gradient-to-r from-transparent to-transparent hover:from-primary/5 hover:to-transparent transition-all duration-300 pl-6 py-2 group"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
           >
             <Link to={`/blog/${post.id}`} className="block">
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
-                  {post.title}
-                </h3>
-                {post.mediumUrl && (
-                  <a
-                    href={post.mediumUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 text-muted-foreground hover:text-accent transition-colors no-print"
-                    onClick={(e) => e.stopPropagation()}
-                    title="Read on Medium"
-                  >
-                    <ExternalLink size={18} />
-                  </a>
-                )}
+              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground mb-1">
+                <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <span>LOG_ENTRY_{post.id.split('-').pop()}</span>
+                <span>::</span>
+                <span>{post.readTime} MIN READ</span>
               </div>
+              
+              <h3 className="text-xl md:text-2xl font-display font-bold uppercase mb-2 group-hover:text-primary transition-colors">
+                {post.title}
+              </h3>
 
-              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
-                <div className="flex items-center gap-1">
-                  <Clock size={14} />
-                  <span>{post.readTime} min read</span>
-                </div>
-              </div>
-
-              <p className="text-foreground/80 leading-relaxed mb-3">
+              <p className="text-sm text-muted-foreground font-mono line-clamp-2 mb-3">
                 {post.excerpt}
               </p>
 
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="outline"
-                    className="border-2 border-foreground/20 hover:border-primary transition-colors font-mono text-xs"
-                  >
-                    #{tag}
-                  </Badge>
-                ))}
+              <div className="flex gap-2">
+                 {post.tags.map((tag) => (
+                   <span key={tag} className="text-[10px] font-bold uppercase border border-foreground/20 px-2 py-0.5 text-foreground/60">
+                     #{tag}
+                   </span>
+                 ))}
               </div>
             </Link>
           </motion.article>
         ))}
-      </motion.div>
+      </div>
 
       {/* Courses Section */}
       {courses.length > 0 && (
         <>
           <motion.div
-            className="mt-16 mb-8 relative"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="flex items-end gap-4 mt-16 mb-8 border-b-3 border-foreground pb-2"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
           >
-            <div className="flex items-center gap-4 mb-2">
-              <motion.div
-                className="w-12 h-12 bg-accent flex items-center justify-center"
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                transition={{ type: "spring" as const, stiffness: 300 }}
-              >
-                <GraduationCap size={24} className="text-foreground" />
-              </motion.div>
-              <h3 className="text-3xl font-display">FREE COURSES</h3>
-            </div>
-            <motion.div
-              className="h-1 w-32 bg-primary ml-16"
-              initial={{ width: 0 }}
-              whileInView={{ width: "8rem" }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-            />
+            <h2 className="text-3xl md:text-4xl font-display font-black uppercase tracking-tighter">
+              Training<span className="text-accent">_Modules</span>
+            </h2>
           </motion.div>
 
-          <motion.div
-            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-          >
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
             {courses.slice(0, 3).map((course) => (
               <motion.article
                 key={course.id}
-                variants={postVariants}
-                className="border-3 border-foreground group hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
-                whileHover={{ y: -2 }}
+                className="border-2 border-foreground bg-card group hover:translate-y-[-4px] hover:shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-all duration-200"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
               >
                 <Link to={`/courses/${course.id}`}>
-                  <div className="bg-foreground text-background p-4 border-b-3 border-foreground">
-                    <Badge className="bg-accent text-foreground border-0 font-mono font-bold mb-2">
-                      {course.difficulty.toUpperCase()}
-                    </Badge>
-                    <h4 className="text-lg font-bold group-hover:text-accent transition-colors">
+                  <div className="bg-foreground text-background p-3 flex justify-between items-center">
+                     <span className="font-mono text-xs font-bold text-accent uppercase">{course.difficulty}</span>
+                     <Radio size={14} className="animate-pulse text-accent" />
+                  </div>
+                  <div className="p-4">
+                    <h4 className="text-lg font-bold uppercase mb-2 group-hover:underline decoration-2 decoration-accent underline-offset-4">
                       {course.title}
                     </h4>
-                  </div>
-                  <div className="p-4 bg-background">
-                    <p className="text-sm text-foreground/80 mb-3 line-clamp-2">
-                      {course.description}
-                    </p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
-                      <div className="flex items-center gap-1">
-                        <BookOpen size={12} />
-                        <span>{course.lessons.length} lessons</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock size={12} />
-                        <span>{course.duration}h</span>
-                      </div>
+                    <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground mt-4 pt-4 border-t border-foreground/10">
+                      <span>{course.lessons.length} MODULES</span>
+                      <span>{course.duration} HRS</span>
                     </div>
                   </div>
                 </Link>
               </motion.article>
             ))}
-          </motion.div>
+          </div>
         </>
       )}
 
-      <motion.div
-        className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.6 }}
-      >
+      <div className="mt-12 text-center">
         <a
           href={getBlogUrl()}
-          className="border-3 border-foreground bg-foreground text-background px-6 py-3 font-mono font-bold hover:bg-background hover:text-foreground transition-colors inline-block"
+          className="inline-flex items-center gap-2 border-2 border-foreground px-8 py-3 font-mono font-bold hover:bg-foreground hover:text-background transition-colors uppercase tracking-wider"
         >
-          View All Posts →
+          <Terminal size={16} />
+          Access Full Archives
         </a>
-        {courses.length > 0 && (
-          <a
-            href={getCoursesUrl()}
-            className="border-3 border-accent bg-accent text-foreground px-6 py-3 font-mono font-bold hover:bg-background hover:text-accent transition-colors inline-block"
-          >
-            Browse All Courses →
-          </a>
-        )}
-        <p className="text-muted-foreground text-sm font-mono">
-          or type <span className="text-primary font-bold">blog</span> in
-          terminal
-        </p>
-      </motion.div>
+      </div>
     </section>
   );
 };

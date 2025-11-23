@@ -1,100 +1,57 @@
-import { Languages } from "lucide-react";
+import { Languages, Signal } from "lucide-react";
 import { motion } from "framer-motion";
 
 const CVLanguages = () => {
   const languages = [
-    { name: "Georgian", level: "Native", proficiency: 100 },
-    { name: "English", level: "C1", proficiency: 90 },
-    { name: "Russian", level: "B2", proficiency: 70 },
-    { name: "French", level: "A1", proficiency: 25 },
+    { name: "Georgian", level: "NATIVE", proficiency: 100, code: "GEO" },
+    { name: "English", level: "C1 / FLUENT", proficiency: 90, code: "ENG" },
+    { name: "Russian", level: "B2 / ADVANCED", proficiency: 70, code: "RUS" },
+    { name: "French", level: "A1 / LEARNING", proficiency: 25, code: "FRA" },
   ];
 
   return (
-    <section className="mb-8 print-break-avoid">
+    <section className="mb-20 print-break-avoid relative" data-section="languages">
       <motion.div
-        className="relative mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
       >
-        <div className="flex items-center gap-4 mb-2">
-          <motion.div
-            className="w-12 h-12 bg-foreground flex items-center justify-center"
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            transition={{ type: "spring" as const, stiffness: 300 }}
-          >
-            <Languages size={24} className="text-background" />
-          </motion.div>
-          <h2 className="text-4xl font-display">LANGUAGES</h2>
-        </div>
-        <motion.div
-          className="h-1 w-32 bg-primary ml-16"
-          initial={{ width: 0 }}
-          whileInView={{ width: "8rem" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        />
+        <h2 className="text-4xl md:text-5xl font-display font-black uppercase tracking-tighter">
+          Comm<span className="text-accent">_Protocols</span>
+        </h2>
       </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {languages.map((lang, index) => (
           <motion.div
             key={index}
-            className="border-3 border-foreground bg-card p-5 group relative overflow-hidden"
+            className="bg-card border-2 border-foreground p-4 relative group"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{
-              duration: 0.4,
-              delay: index * 0.1,
-              type: "spring" as const,
-              stiffness: 100,
-              damping: 12,
-            }}
-            whileHover={{
-              y: -4,
-              boxShadow: "8px 8px 0 hsl(var(--foreground) / 0.1)",
-              transition: { duration: 0.2 },
-            }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
           >
-            {/* Corner accent */}
-            <div className="absolute top-0 right-0 w-0 h-0 border-t-[30px] border-r-[30px] border-t-primary border-r-transparent opacity-20"></div>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-display font-bold text-xl uppercase">{lang.code}</h3>
+              <Signal size={16} className={lang.proficiency > 80 ? "text-success" : "text-warning"} />
+            </div>
+            
+            <div className="text-xs font-mono mb-3 text-muted-foreground uppercase tracking-wider">
+              {lang.name} // {lang.level}
+            </div>
 
-            <div className="relative">
-              <div className="flex items-baseline justify-between mb-4">
-                <span className="text-xl font-bold font-mono uppercase">
-                  {lang.name}
-                </span>
-                <span className="text-xs font-bold font-mono px-2 py-1 bg-foreground text-background">
-                  {lang.level}
-                </span>
-              </div>
-
-              {/* Progress bar - brutalist style */}
-              <div className="space-y-1">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs font-mono uppercase text-muted-foreground">
-                    Proficiency
-                  </span>
-                  <span className="text-xs font-bold font-mono">
-                    {lang.proficiency}%
-                  </span>
-                </div>
-                <div className="w-full h-3 bg-muted border-2 border-foreground overflow-hidden">
-                  <motion.div
-                    className="h-full bg-primary"
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${lang.proficiency}%` }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.8,
-                      delay: index * 0.1 + 0.3,
-                      ease: "easeOut",
-                    }}
-                  />
-                </div>
-              </div>
+            {/* Signal Bars */}
+            <div className="flex gap-1 h-8 items-end">
+              {[...Array(10)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className={`w-full ${i * 10 < lang.proficiency ? 'bg-foreground' : 'bg-foreground/10'}`}
+                  initial={{ height: "10%" }}
+                  whileInView={{ height: i * 10 < lang.proficiency ? `${Math.max(20, Math.random() * 100)}%` : "10%" }}
+                  transition={{ duration: 0.5, delay: index * 0.1 + i * 0.05 }}
+                />
+              ))}
             </div>
           </motion.div>
         ))}

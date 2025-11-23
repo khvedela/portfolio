@@ -1,4 +1,4 @@
-import { GraduationCap, Calendar, MapPin } from "lucide-react";
+import { GraduationCap, Calendar, MapPin, Award } from "lucide-react";
 import { motion } from "framer-motion";
 
 const CVEducation = () => {
@@ -9,6 +9,7 @@ const CVEducation = () => {
       period: "2024–Present",
       location: "Paris, France",
       note: "Expanding into infrastructure and IoT systems",
+      status: "IN_PROGRESS"
     },
     {
       institution: "Business and Technology University",
@@ -16,80 +17,61 @@ const CVEducation = () => {
       period: "2020–2024",
       location: "Tbilisi, Georgia",
       note: "Graduated while working full-time at TBC Bank",
+      status: "COMPLETED"
     },
   ];
 
   return (
-    <section className="mb-16 print-break-avoid" data-section="education">
+    <section className="mb-20 print-break-avoid relative" data-section="education">
       <motion.div
-        className="relative mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
       >
-        <div className="flex items-center gap-4 mb-2">
-          <motion.div
-            className="w-12 h-12 bg-foreground flex items-center justify-center"
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            transition={{ type: "spring" as const, stiffness: 300 }}
-          >
-            <GraduationCap size={24} className="text-background" />
-          </motion.div>
-          <h2 className="text-4xl font-display">EDUCATION</h2>
+        <h2 className="text-4xl md:text-5xl font-display font-black uppercase tracking-tighter">
+          Academic<span className="text-accent">_Records</span>
+        </h2>
+        <div className="mb-2 text-xs font-mono text-muted-foreground hidden md:block">
+          // EDUCATIONAL DATABASE
         </div>
-        <motion.div
-          className="h-1 w-32 bg-accent ml-16"
-          initial={{ width: 0 }}
-          whileInView={{ width: "8rem" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        />
       </motion.div>
 
       <div className="space-y-6">
         {education.map((edu, index) => (
           <motion.div
             key={index}
-            className="border-3 border-foreground bg-card p-6 group"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{
-              duration: 0.5,
-              delay: index * 0.1,
-              ease: [0.25, 0.1, 0.25, 1],
-            }}
-            whileHover={{
-              y: -4,
-              boxShadow: "8px 8px 0 hsl(var(--foreground) / 0.1)",
-              transition: { duration: 0.2 },
-            }}
+            className="relative border-2 border-foreground bg-card p-1"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
           >
-            <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-bold font-mono uppercase mb-2">
-                  {edu.institution}
-                </h3>
-                <p className="text-base font-mono">{edu.degree}</p>
+            <div className="border border-dashed border-foreground/30 p-6 flex flex-col md:flex-row justify-between gap-6 items-start md:items-center relative overflow-hidden">
+              {/* Watermark */}
+              <div className="absolute -right-10 -top-10 text-9xl font-black text-foreground/5 rotate-12 pointer-events-none uppercase select-none">
+                EDU
               </div>
-              <div className="text-right text-sm font-mono bg-muted px-4 py-2 border-2 border-foreground">
-                <div className="flex items-center gap-2 justify-end mb-1 font-bold">
-                  <Calendar size={14} />
-                  <span>{edu.period}</span>
-                </div>
-                <div className="flex items-center gap-2 justify-end">
-                  <MapPin size={14} />
-                  <span>{edu.location}</span>
-                </div>
+
+              <div>
+                 <div className="flex items-center gap-3 mb-2">
+                   <span className="px-2 py-0.5 bg-foreground text-background text-xs font-mono font-bold uppercase">{edu.status}</span>
+                   <span className="text-xs font-mono text-muted-foreground">{edu.period}</span>
+                 </div>
+                 <h3 className="text-2xl font-display font-bold uppercase mb-1">{edu.institution}</h3>
+                 <p className="font-mono text-sm font-bold text-accent mb-2">{edu.degree}</p>
+                 <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                   <MapPin size={12} />
+                   <span>{edu.location}</span>
+                 </div>
+              </div>
+
+              <div className="md:text-right max-w-xs relative z-10">
+                 <div className="p-3 bg-secondary/20 border-l-2 border-accent">
+                   <p className="text-xs italic font-mono">{edu.note}</p>
+                 </div>
               </div>
             </div>
-
-            {edu.note && (
-              <div className="border-l-4 border-accent pl-4 mt-4">
-                <p className="text-sm italic">{edu.note}</p>
-              </div>
-            )}
           </motion.div>
         ))}
       </div>

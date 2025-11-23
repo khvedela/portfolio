@@ -40,8 +40,11 @@ const Index = () => {
 
   return (
     <>
-      {/* Custom cursor - removed as it is now global */}
-
+      {/* Global Atmospheric Effects */}
+      <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03] mix-blend-overlay">
+        <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KPC9zdmc+')] opacity-50" />
+      </div>
+      <div className="fixed inset-0 pointer-events-none z-[100] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_3px,3px_100%] bg-repeat" />
 
       {/* Show only loading screen if it hasn't been dismissed */}
       <AnimatePresence mode="wait">
@@ -55,18 +58,20 @@ const Index = () => {
 
       {/* Only render main content after loading is complete */}
       {!showLoading && (
-        <div className="min-h-screen transition-colors duration-200">
+        <div className="min-h-screen transition-colors duration-200 relative overflow-hidden">
+           
+          {/* Background Grid - Fixed */}
+          <div className="fixed inset-0 bg-grid-large opacity-[0.03] pointer-events-none" />
+
           {/* Brutalist progress bar */}
           <BrutalistProgressBar />
 
-          <Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center font-mono">Loading...</div>}>
+          <Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center font-mono">Loading System Modules...</div>}>
             <CVHeader />
 
-            <main className="max-w-4xl mx-auto px-6 py-16 print:py-8 relative">
-              {/* Decorative grid background */}
-              <div className="absolute inset-0 bg-grid opacity-[0.02] pointer-events-none"></div>
-
-              <div className="relative">
+            <main className="max-w-4xl mx-auto px-4 md:px-6 py-16 print:py-8 relative z-10">
+              
+              <div className="relative space-y-24">
                 <CVAbout />
                 <CVCaseStudies />
                 <CVTechStack />
@@ -79,7 +84,7 @@ const Index = () => {
 
           {/* Footer - brutalist */}
           <motion.footer
-            className="no-print border-t-5 border-foreground py-10 px-6 mt-20 bg-foreground text-background relative overflow-hidden"
+            className="no-print border-t-4 border-foreground py-12 px-6 mt-20 bg-foreground text-background relative overflow-hidden"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -106,10 +111,12 @@ const Index = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <p className="font-mono text-sm mb-3 uppercase tracking-widest">
-                Built with Love, Confidence and Coffee
+              <p className="font-mono text-sm mb-4 uppercase tracking-widest flex items-center justify-center gap-2">
+                 <span className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                 System Status: Operational
               </p>
-              <div className="flex items-center justify-center gap-3 mb-2">
+              
+              <div className="flex items-center justify-center gap-3 mb-4">
                 <motion.div
                   className="h-px w-12 bg-primary"
                   initial={{ width: 0 }}
@@ -117,9 +124,8 @@ const Index = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 />
-                <p className="text-xs font-mono">
-                  No AI-generated corporate poetry. No spinning cubes. Just work
-                  that matters.
+                <p className="text-xs font-mono opacity-70">
+                  NO AI POETRY. NO SPINNING CUBES. JUST RAW DATA.
                 </p>
                 <motion.div
                   className="h-px w-12 bg-accent"
@@ -128,6 +134,10 @@ const Index = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 />
+              </div>
+              
+              <div className="font-mono text-[10px] text-muted-foreground">
+                 BUILD_ID: 2025.11.23.RELEASE // PARIS_SECTOR
               </div>
             </motion.div>
           </motion.footer>

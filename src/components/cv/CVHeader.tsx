@@ -1,290 +1,183 @@
-import { Mail, Phone, Globe, Linkedin, Github, Copy } from "lucide-react";
+import { Mail, Phone, Globe, Linkedin, Github, Copy, Cpu, Wifi, Battery, Activity } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBrutalistToast } from "@/hooks/useBrutalistToast";
 import BrutalistToast from "../BrutalistToast";
+import GyroCore from "../three/GyroCore"; 
+import DecryptedText from "../DecryptedText";
 
 const CVHeader = () => {
   const [hoveredIcon, setHoveredIcon] = useState<number | null>(null);
-  const [easterEggClicks, setEasterEggClicks] = useState(0);
+  const [uptime, setUptime] = useState(0);
   const { toast, hideToast, copyToClipboard } = useBrutalistToast();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setUptime(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatUptime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const handleEasterEgg = () => {
-    const messages = [
-      "🤔 Curious, aren't we?",
-      "🔍 Still clicking? There might be something here...",
-      "🎯 You're persistent! Keep going...",
-      "🌟 Almost there! One more click...",
-      "🎉 You found it! devdavid.me - But you already knew that, didn't you? 😏",
-    ];
-
-    const newCount = easterEggClicks + 1;
-    setEasterEggClicks(newCount);
-
-    if (newCount <= messages.length) {
-      copyToClipboard(
-        newCount === messages.length ? "https://devdavid.me" : "",
-        messages[newCount - 1]
-      );
+      transition: { staggerChildren: 0.1 }
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        type: "spring" as const,
-        stiffness: 100,
-        damping: 15,
-      },
-    },
-  };
-
-  const contactVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
+  const snapVariants = {
+    hidden: { opacity: 0, scale: 0.8, filter: "blur(10px)" },
     visible: {
       opacity: 1,
       scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 120,
-        damping: 12,
-      },
-    },
+      filter: "blur(0px)",
+      transition: { type: "spring", stiffness: 300, damping: 20 }
+    }
+  };
+
+  const glitchText = {
+    hidden: { x: -10, opacity: 0 },
+    visible: { x: 0, opacity: 1, transition: { type: "steps(3)" } }
   };
 
   return (
-    <header className="relative bg-foreground text-background py-16 px-6 print:py-10 overflow-hidden border-b-6 border-accent">
-      {/* Accent corner brackets */}
-      <motion.div
-        className="absolute top-0 left-0 w-24 h-24 border-l-5 border-t-5 border-primary"
-        initial={{ opacity: 0, x: -20, y: -20 }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 right-0 w-24 h-24 border-r-5 border-b-5 border-accent"
-        initial={{ opacity: 0, x: 20, y: 20 }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-      />
+    <header className="relative bg-background text-foreground pt-12 pb-8 px-4 md:px-0 mb-12 overflow-hidden">
+      {/* Background Grid/Noise */}
+      <div className="absolute inset-0 bg-grid-large opacity-[0.05] pointer-events-none z-0" />
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* Name & Title */}
+      {/* Background 3D Model */}
+      <div className="absolute inset-0 z-0 pointer-events-auto opacity-50 md:opacity-100">
+         <GyroCore color="hsl(var(--primary))" bgColor="transparent" />
+      </div>
+
+      <div className="max-w-4xl mx-auto relative z-10 pointer-events-none">
+        {/* Top Status Bar */}
         <motion.div
-          className="mb-10"
+          className="flex justify-between items-end border-b-3 border-foreground pb-2 mb-6 font-mono text-xs md:text-sm uppercase tracking-widest pointer-events-auto"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-success">
+              <Activity size={14} className="animate-pulse" />
+              <span>SYSTEM ONLINE</span>
+            </div>
+            <span className="hidden md:inline text-muted-foreground">|</span>
+            <div className="hidden md:flex items-center gap-2">
+              <Cpu size={14} />
+              <span>MEM: OPTIMAL</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">SESSION:</span>
+              <span className="font-bold">{formatUptime(uptime)}</span>
+            </div>
+            <div className="bg-foreground text-background px-2 py-0.5 font-bold">
+              V.2025.1
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Main Identity Block */}
+        <motion.div
+          className="grid grid-cols-1 gap-6 mb-12"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div
-            className="mb-2 flex items-center gap-4"
-            variants={itemVariants}
-          >
-            <motion.div
-              className="w-2 h-16 bg-primary"
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            />
-            <h1 className="text-5xl md:text-7xl font-display leading-none">
-              David Khvedelidze
-            </h1>
-          </motion.div>
+          {/* Name and Role - Centered */}
+          <motion.div className="flex flex-col items-center justify-center text-center pt-10" variants={containerVariants}>
+            <div>
+              <motion.div className="flex items-center justify-center gap-2 mb-2" variants={glitchText}>
+                <span className="text-accent font-mono text-sm font-bold tracking-wider bg-background/80 backdrop-blur-sm px-2">/// IDENTITY CONFIRMED</span>
+              </motion.div>
+              <motion.h1
+                className="text-5xl md:text-8xl lg:text-9xl font-display font-black leading-[0.9] tracking-tighter uppercase mb-6"
+                variants={snapVariants}
+              >
+                <span className="block text-foreground drop-shadow-2xl">David</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-foreground/80 drop-shadow-2xl">
+                   Khvedelidze
+                </span>
+              </motion.h1>
+              <motion.div
+                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-lg md:text-2xl font-bold font-mono-tight bg-background/50 backdrop-blur-md p-4 border-y-2 border-foreground/10 inline-flex pointer-events-auto"
+                variants={glitchText}
+              >
+                <span className="bg-accent/10 px-2 py-0.5 text-accent-foreground border border-accent">
+                  <DecryptedText text="FRONTEND_ENGINEER" speed={30} />
+                </span>
+                <span className="text-muted-foreground hidden md:inline">::</span>
+                <span>
+                   <DecryptedText text="ANGULAR_SPECIALIST" speed={30} />
+                </span>
+              </motion.div>
+            </div>
 
-          <motion.div
-            className="ml-6 mt-6 border-l-3 border-accent pl-6"
-            variants={itemVariants}
-          >
-            <p className="text-xl md:text-3xl font-bold mb-2 font-mono-tight">
-              Frontend Engineer <span className="text-primary">×</span> Angular
-              Specialist
-            </p>
-            <p className="text-base md:text-xl opacity-75 font-mono">
-              4+ Years Building Things That Work
-            </p>
+            {/* Stat Grid */}
+            <div className="grid grid-cols-3 gap-8 mt-12 border-t-3 border-foreground/20 pt-6 w-full max-w-2xl bg-background/80 backdrop-blur-sm p-4 pointer-events-auto">
+              {[
+                { label: "EXPERIENCE", value: "04 YRS" },
+                { label: "STACK", value: "ANGULAR" },
+                { label: "LOCATION", value: "PARIS, FR" },
+              ].map((stat, i) => (
+                <div key={i} className="flex flex-col items-center">
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1">{stat.label}</span>
+                  <span className="text-xl md:text-3xl font-display font-bold">{stat.value}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </motion.div>
 
-        {/* Contact Info */}
+        {/* Communication Channels */}
         <motion.div
-          className="flex gap-3 text-sm md:text-base font-mono"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+          className="border-y-3 border-foreground py-6 bg-background/90 backdrop-blur-sm pointer-events-auto"
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
         >
-          {[
-            {
-              icon: Mail,
-              text: "davidkhvedelidze@gmail.com",
-              copyText: "davidkhvedelidze@gmail.com",
-              href: "mailto:davidkhvedelidze@gmail.com",
-              color: "primary",
-              copyable: true,
-            },
-            {
-              icon: Phone,
-              text: "+33 7 69 82 79 66",
-              copyText: "+33769827966",
-              href: "tel:+33769827966",
-              color: "primary",
-              copyable: true,
-            },
-            {
-              icon: Globe,
-              text: "???",
-              copyText: "",
-              href: "#",
-              color: "accent",
-              copyable: false,
-              isEasterEgg: true,
-            },
-            {
-              icon: Linkedin,
-              text: "linkedin.com/in/khvedelidzedavid",
-              copyText: "https://www.linkedin.com/in/khvedelidzedavid/",
-              href: "https://www.linkedin.com/in/khvedelidzedavid/",
-              color: "accent",
-              copyable: false,
-            },
-          ].map((contact, index) => {
-            const Icon = contact.icon;
+          <div className="flex flex-wrap justify-between items-center gap-6 px-4">
+             <div className="flex items-center gap-2 font-mono text-sm font-bold bg-foreground text-background px-3 py-1">
+               <Wifi size={14} className="animate-pulse" />
+               <span>UPLINKS_ACTIVE</span>
+             </div>
 
-            return (
-              <div key={index} className="relative group">
-                <motion.div
-                  className="relative"
-                  onContextMenu={(e) => {
-                    // Long press on mobile - copy instead of context menu
-                    if (contact.copyable) {
-                      e.preventDefault();
-                      copyToClipboard(contact.copyText, contact.text);
-                    }
-                  }}
-                >
-                  <motion.a
-                    href={contact.href}
-                    target={
-                      contact.href.startsWith("http") ? "_blank" : undefined
-                    }
-                    rel={
-                      contact.href.startsWith("http")
-                        ? "noopener noreferrer"
-                        : undefined
-                    }
-                    title={contact.text}
-                    onClick={(e) => {
-                      // Easter egg handler
-                      if (contact.isEasterEgg) {
-                        e.preventDefault();
-                        handleEasterEgg();
-                        return;
-                      }
-
-                      // On mobile (touch devices), if copyable, copy instead of navigate
-                      if (contact.copyable && "ontouchstart" in window) {
-                        e.preventDefault();
-                        copyToClipboard(contact.copyText, contact.text);
-                      }
-                    }}
-                    className={`w-12 h-12 flex items-center justify-center bg-${contact.color
-                      } text-foreground border-3 transition-all duration-200 shrink-0 border-${contact.color
-                      }/30 hover:border-background cursor-pointer ${hoveredIcon === index
-                        ? "scale-125 shadow-[0_0_30px_rgba(0,200,255,0.6)]"
-                        : ""
-                      }`}
-                    variants={contactVariants}
-                    onMouseEnter={() => setHoveredIcon(index)}
-                    onMouseLeave={() => setHoveredIcon(null)}
-                  >
-                    <motion.div
-                      animate={{
-                        scale:
-                          hoveredIcon === index
-                            ? 1.2
-                            : contact.isEasterEgg
-                              ? [1, 1.1, 1]
-                              : 1,
-                        rotate: hoveredIcon === index ? [0, -5, 5, 0] : 0,
-                      }}
-                      transition={{
-                        duration: 0.3,
-                        scale: contact.isEasterEgg
-                          ? {
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }
-                          : undefined,
-                        rotate: {
-                          duration: 0.5,
-                          repeat: hoveredIcon === index ? Infinity : 0,
-                        },
-                      }}
-                    >
-                      <Icon size={20} />
-                    </motion.div>
-                  </motion.a>
-
-                  {/* Easter egg indicator - mysterious question mark */}
-                  {contact.isEasterEgg && (
-                    <motion.div
-                      className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary border-2 border-foreground flex items-center justify-center pointer-events-none font-bold text-[8px]"
-                      animate={{
-                        opacity: [0.6, 1, 0.6],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      ?
-                    </motion.div>
-                  )}
-
-                  {/* Mobile tap indicator - shows on copyable items */}
-                  {contact.copyable && (
-                    <div className="lg:hidden absolute -bottom-1 -right-1 w-4 h-4 bg-accent border-2 border-foreground flex items-center justify-center pointer-events-none">
-                      <Copy size={10} className="text-foreground" />
-                    </div>
-                  )}
-                </motion.div>
-
-                {/* Copy button - only for desktop/hover */}
-                {contact.copyable && (
-                  <motion.button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      copyToClipboard(contact.copyText, contact.text);
-                    }}
-                    className="hidden lg:block absolute -top-2 -right-2 w-6 h-6 bg-accent text-foreground border-2 border-foreground opacity-0 group-hover:opacity-100 transition-opacity items-center justify-center no-print"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    title={`Copy ${contact.text}`}
-                  >
-                    <Copy size={12} />
-                  </motion.button>
-                )}
-              </div>
-            );
-          })}
+             <div className="flex gap-3">
+               {[
+                  { icon: Mail, href: "mailto:davidkhvedelidze@gmail.com", label: "EMAIL" },
+                  { icon: Linkedin, href: "https://www.linkedin.com/in/khvedelidzedavid/", label: "LINKEDIN" },
+                  { icon: Github, href: "https://github.com/khvedelidzedavid", label: "GITHUB" },
+                  { icon: Phone, href: "tel:+33769827966", label: "PHONE" },
+               ].map((link, i) => (
+                 <motion.a
+                   key={i}
+                   href={link.href}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="group relative overflow-hidden border-2 border-foreground p-3 hover:bg-foreground hover:text-background transition-colors duration-0"
+                   whileHover={{ y: -4, x: 4 }}
+                   whileTap={{ y: 0, x: 0 }}
+                 >
+                   <link.icon size={20} />
+                   <div className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-20 transition-opacity duration-0" />
+                 </motion.a>
+               ))}
+             </div>
+          </div>
         </motion.div>
       </div>
 
-      {/* Toast notification */}
       <BrutalistToast
         message={toast.message}
         isVisible={toast.isVisible}
