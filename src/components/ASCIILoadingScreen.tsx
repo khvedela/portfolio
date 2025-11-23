@@ -30,14 +30,26 @@ const ASCIILoadingScreen = ({ onComplete }: ASCIILoadingScreenProps) => {
   const [isBiosOpen, setIsBiosOpen] = useState(false);
   const [theme, setTheme] = useState<ColorTheme>("green");
   const [isExiting, setIsExiting] = useState(false);
+  const [shouldRender, setShouldRender] = useState(true);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const [bootSequence, setBootSequence] = useState<string[]>([
     "INITIALIZING DK_KERNEL V4.0...",
     "CHECKING SYSTEM INTEGRITY... [OK]",
   ]);
 
+  // Check session storage on mount
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem("hasVisited");
+    if (hasVisited) {
+      setShouldRender(false);
+      onComplete?.();
+    }
+  }, []);
+
   // System Diagnostics
   useEffect(() => {
+    if (!shouldRender) return;
+
     const initSystem = async () => {
       const nav = window.navigator as any;
       const width = window.innerWidth;
@@ -167,6 +179,7 @@ const ASCIILoadingScreen = ({ onComplete }: ASCIILoadingScreenProps) => {
     if (isExiting) return;
     setIsExiting(true);
     playSound('click');
+    sessionStorage.setItem("hasVisited", "true");
     // Wait for animation then complete
     setTimeout(() => {
       onComplete?.();
@@ -183,6 +196,8 @@ const ASCIILoadingScreen = ({ onComplete }: ASCIILoadingScreenProps) => {
   const currentBorder = THEME_BORDERS[theme];
   
   const buttonText = useTextScramble("[ ACCESS PORTFOLIO ]", showEnterButton);
+
+  if (!shouldRender) return null;
 
   return (
     <motion.div

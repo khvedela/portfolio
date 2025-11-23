@@ -5,17 +5,31 @@ import {
   CheckCircle2,
   Target,
   Zap,
+  Folder,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Terminal
 } from "lucide-react";
-import { Badge } from "../ui/badge";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import RobotTrigger from "../RobotTrigger";
 
 const CVCaseStudies = () => {
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+
+  const toggleStudy = (index: number) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
   const caseStudies = [
     {
+      id: "MSN-001",
       company: "TBC Bank",
       role: "Frontend Developer (Angular)",
       period: "Mar 2020 – Present",
       location: "Tbilisi, Georgia",
+      status: "DEPLOYED",
       problem:
         "5+ mission-critical banking applications suffering from slow load times (4-6s), bloated bundles, and recurring state management bugs. Users were abandoning transactions. Mobile experience was terrible.",
       approach: [
@@ -61,10 +75,12 @@ const CVCaseStudies = () => {
         "Would implement microfrontend architecture earlier for better team autonomy. Would also add real-user monitoring (RUM) to catch performance regressions before users complain.",
     },
     {
+      id: "MSN-002",
       company: "GetNugget",
       role: "Angular Developer (Contract)",
       period: "Mar 2023 – Jul 2024",
       location: "Remote (EU)",
+      status: "COMPLETED",
       problem:
         "Content discovery platform with poor performance (TTI >5s), no accessibility compliance, and clunky build process slowing down deployments.",
       approach: [
@@ -102,194 +118,169 @@ const CVCaseStudies = () => {
   ];
 
   return (
-    <section className="mb-16 print-break-avoid" data-section="work">
+    <RobotTrigger mode="work">
+    <section className="mb-20 print-break-avoid relative" data-section="work">
       <motion.div
-        className="relative mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
       >
-        <div className="flex items-center gap-4 mb-2">
-          <motion.div
-            className="w-12 h-12 bg-foreground flex items-center justify-center"
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            transition={{ type: "spring" as const, stiffness: 300 }}
-          >
-            <Briefcase size={24} className="text-background" />
-          </motion.div>
-          <h2 className="text-4xl font-display">CASE STUDIES</h2>
+        <h2 className="text-4xl md:text-5xl font-display font-black uppercase tracking-tighter">
+          Mission<span className="text-accent">_Archives</span>
+        </h2>
+        <div className="mb-2 text-xs font-mono text-muted-foreground hidden md:block">
+          // AUTHORIZED PERSONNEL ONLY
         </div>
-        <motion.div
-          className="h-1 w-32 bg-accent ml-16"
-          initial={{ width: 0 }}
-          whileInView={{ width: "8rem" }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        />
       </motion.div>
 
-      <div className="space-y-16">
+      <div className="space-y-4">
         {caseStudies.map((study, index) => (
-          <motion.article
+          <motion.div
             key={index}
-            className="relative border-3 border-foreground p-8 bg-card print-break-avoid"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{
-              duration: 0.6,
-              delay: index * 0.1,
-              ease: [0.25, 0.1, 0.25, 1],
-            }}
-            whileHover={{
-              boxShadow: "8px 8px 0 hsl(var(--foreground) / 0.15)",
-              transition: { duration: 0.2 },
-            }}
+            className={`relative border-2 transition-colors duration-300 overflow-hidden ${
+              expandedIndex === index 
+                ? "border-foreground bg-card" 
+                : "border-foreground/40 bg-card/50 hover:border-foreground hover:bg-card"
+            }`}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
           >
-            {/* Company label - brutalist tag */}
-            <div className="absolute -top-5 left-8 bg-accent px-6 py-2 border-3 border-foreground">
-              <span className="text-lg font-bold font-mono uppercase">
-                {study.company}
-              </span>
-            </div>
-
-            {/* Header */}
-            <div className="mt-4 mb-8 pb-6 border-b-3 border-border">
-              <div className="flex flex-wrap items-start justify-between gap-4">
+            {/* File Header (Always Visible) */}
+            <button
+              onClick={() => toggleStudy(index)}
+              className="w-full flex items-center justify-between p-6 text-left focus:outline-none group"
+            >
+              <div className="flex items-center gap-4 md:gap-8">
+                <div className={`p-3 border-2 ${expandedIndex === index ? "bg-primary border-primary text-primary-foreground" : "border-foreground/30 text-foreground/50 group-hover:border-foreground group-hover:text-foreground"}`}>
+                  <Folder size={24} />
+                </div>
                 <div>
-                  <p className="text-xl font-bold font-mono mb-1">
-                    {study.role}
-                  </p>
-                </div>
-                <div className="text-right text-sm font-mono bg-muted px-4 py-2 border-2 border-foreground">
-                  <p className="font-bold">{study.period}</p>
-                  <p>{study.location}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-mono text-xs font-bold text-accent uppercase tracking-widest">{study.id}</span>
+                    <span className="w-1 h-1 bg-foreground rounded-full opacity-50" />
+                    <span className="font-mono text-xs font-bold text-muted-foreground uppercase">{study.status}</span>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-display font-bold uppercase">{study.company}</h3>
                 </div>
               </div>
-            </div>
 
-            {/* Problem */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-destructive flex items-center justify-center">
-                  <Target size={18} className="text-background" />
+              <div className="flex items-center gap-4">
+                <div className="text-right hidden md:block">
+                  <div className="font-mono text-xs opacity-50 uppercase">Clearance</div>
+                  <div className="font-bold font-mono text-sm">LEVEL 5</div>
                 </div>
-                <h4 className="text-sm font-bold uppercase tracking-widest font-mono">
-                  THE PROBLEM
-                </h4>
-              </div>
-              <div className="border-l-5 border-destructive pl-6">
-                <p className="text-base leading-relaxed">{study.problem}</p>
-              </div>
-            </div>
-
-            {/* Approach */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-warning flex items-center justify-center">
-                  <Lightbulb size={18} className="text-foreground" />
+                <div className={`transform transition-transform duration-300 ${expandedIndex === index ? "rotate-180" : ""}`}>
+                  <ChevronDown size={24} />
                 </div>
-                <h4 className="text-sm font-bold uppercase tracking-widest font-mono">
-                  HOW I APPROACHED IT
-                </h4>
               </div>
-              <ul className="space-y-3 border-l-5 border-warning pl-6">
-                {study.approach.map((item, i) => (
-                  <li key={i} className="flex items-start gap-4 text-base">
-                    <span className="flex-shrink-0 w-6 h-6 bg-foreground text-background flex items-center justify-center text-xs font-bold font-mono mt-0.5">
-                      {i + 1}
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </button>
 
-            {/* Results */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-success flex items-center justify-center">
-                  <TrendingDown size={18} className="text-background" />
-                </div>
-                <h4 className="text-sm font-bold uppercase tracking-widest font-mono">
-                  RESULTS
-                </h4>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {study.results.map((result, i) => (
-                  <motion.div
-                    key={i}
-                    className="border-3 border-success p-5 bg-success/5 relative overflow-hidden group"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      delay: i * 0.05,
-                      duration: 0.3,
-                      ease: "easeOut",
-                    }}
-                    whileHover={{
-                      backgroundColor: "hsl(var(--success) / 0.15)",
-                      y: -2,
-                      transition: { duration: 0.2 },
-                    }}
-                  >
-                    {/* Diagonal stripe accent */}
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-success/20 transform translate-x-8 -translate-y-8 rotate-45"></div>
-
-                    <div className="relative">
-                      <div className="flex items-baseline gap-2 mb-2">
-                        <CheckCircle2
-                          size={16}
-                          className="text-success flex-shrink-0 mt-1"
-                        />
-                        <span className="text-3xl font-bold font-mono leading-none">
-                          {result.metric}
-                        </span>
-                      </div>
-                      <p className="text-sm font-mono">{result.description}</p>
+            {/* Expanded Content */}
+            <AnimatePresence>
+              {expandedIndex === index && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <div className="px-6 pb-8 pt-2 border-t-2 border-dashed border-foreground/20 mx-6">
+                    
+                    {/* Role & Location Info */}
+                    <div className="flex flex-wrap gap-4 mb-8 font-mono text-sm bg-secondary/20 p-4 border-l-2 border-foreground">
+                       <div className="flex items-center gap-2">
+                         <Terminal size={14} />
+                         <span className="font-bold">{study.role}</span>
+                       </div>
+                       <div className="hidden md:block text-muted-foreground">|</div>
+                       <div>{study.period}</div>
+                       <div className="hidden md:block text-muted-foreground">|</div>
+                       <div>{study.location}</div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
 
-            {/* Tech Stack */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-primary flex items-center justify-center">
-                  <Zap size={18} className="text-foreground" />
-                </div>
-                <h4 className="text-sm font-bold uppercase tracking-widest font-mono">
-                  TECH STACK
-                </h4>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {study.stack.map((tech, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-foreground text-background font-mono text-sm font-bold border-2 border-foreground hover:bg-background hover:text-foreground transition-colors"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
+                    {/* Grid Content */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      
+                      {/* Left Column: Objectives & Tactics */}
+                      <div className="space-y-8">
+                        <div>
+                          <div className="flex items-center gap-2 mb-3 text-destructive">
+                            <Target size={18} />
+                            <h4 className="font-mono font-bold uppercase tracking-wider text-sm">Mission Objective</h4>
+                          </div>
+                          <p className="text-sm md:text-base leading-relaxed border-l-2 border-destructive/30 pl-4">
+                            {study.problem}
+                          </p>
+                        </div>
 
-            {/* Would Improve */}
-            <div className="bg-muted border-l-6 border-accent p-5">
-              <p className="text-xs font-bold uppercase tracking-widest mb-2 font-mono text-muted-foreground">
-                What I'd improve today:
-              </p>
-              <p className="text-sm italic leading-relaxed">
-                {study.wouldImprove}
-              </p>
-            </div>
-          </motion.article>
+                        <div>
+                          <div className="flex items-center gap-2 mb-3 text-primary">
+                            <Zap size={18} />
+                            <h4 className="font-mono font-bold uppercase tracking-wider text-sm">Tactical Execution</h4>
+                          </div>
+                          <ul className="space-y-2">
+                            {study.approach.map((item, i) => (
+                              <li key={i} className="flex items-start gap-3 text-sm">
+                                <span className="mt-1.5 w-1.5 h-1.5 bg-primary shrink-0" />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Right Column: Outcomes & Stack */}
+                      <div className="space-y-8">
+                         <div>
+                          <div className="flex items-center gap-2 mb-3 text-success">
+                            <TrendingDown size={18} />
+                            <h4 className="font-mono font-bold uppercase tracking-wider text-sm">Mission Outcomes</h4>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {study.results.map((result, i) => (
+                              <div key={i} className="bg-success/5 border border-success/20 p-3">
+                                <div className="text-xl font-display font-bold text-success">{result.metric}</div>
+                                <div className="text-[10px] font-mono uppercase leading-tight opacity-80">{result.description}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2 mb-3 text-muted-foreground">
+                            <FileText size={18} />
+                            <h4 className="font-mono font-bold uppercase tracking-wider text-sm">Tech Arsenal</h4>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {study.stack.map((tech, i) => (
+                              <span key={i} className="px-2 py-1 text-xs font-mono border border-foreground/30 text-foreground/70">
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Footer Note */}
+                    <div className="mt-8 pt-4 border-t border-foreground/10">
+                      <p className="text-xs font-mono text-muted-foreground">
+                        <span className="font-bold text-accent">POST_MISSION_ANALYSIS:</span> {study.wouldImprove}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         ))}
       </div>
     </section>
+    </RobotTrigger>
   );
 };
 

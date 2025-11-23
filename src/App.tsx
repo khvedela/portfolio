@@ -18,6 +18,8 @@ import CustomCursor from "./components/CustomCursor";
 import CommandMenu from "./components/CommandMenu";
 import LiveCodeBackground from "./components/LiveCodeBackground";
 import BrutalistTerminal from "./components/BrutalistTerminal";
+import { playSound } from "@/lib/audio";
+import SystemTransition from "./components/SystemTransition";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,7 @@ const AppContent = () => {
   const [isDark, setIsDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [matrixMode, setMatrixMode] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
 
   useEffect(() => {
     // Initial theme check
@@ -69,16 +72,32 @@ const AppContent = () => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setMenuOpen((prev) => !prev);
+        playSound('hover');
       }
       // Cmd+T for Theme (optional, but fun)
       if ((e.metaKey || e.ctrlKey) && e.key === "b" && e.shiftKey) { 
          e.preventDefault();
          toggleTheme();
+         playSound('click');
       }
       // Cmd+D for Desktop Mode
       if ((e.metaKey || e.ctrlKey) && e.key === "d") {
         e.preventDefault();
         navigate("/desktop");
+        playSound('boot');
+      }
+      
+      // Backtick for Terminal
+      if (e.key === "`" || e.key === "~") {
+        e.preventDefault(); // Prevent typing ` in inputs if not desired, though we might want to be careful here if user is typing in a form
+        // Only toggle if we are NOT in an input/textarea, unless it's modifier+key
+        const activeElement = document.activeElement as HTMLElement;
+        const isInput = activeElement && (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA");
+        
+        if (!isInput || e.metaKey || e.ctrlKey) {
+           setTerminalOpen(prev => !prev);
+           playSound('click');
+        }
       }
     };
 
@@ -90,7 +109,10 @@ const AppContent = () => {
     <>
       <LiveCodeBackground isMatrix={matrixMode} />
       <CustomCursor />
+      <SystemTransition />
       <BrutalistTerminal 
+        isOpen={terminalOpen}
+        onToggle={setTerminalOpen}
         onOpenCommandMenu={() => setMenuOpen(true)} 
         onNavigateToDesktop={() => navigate("/desktop")} 
       />

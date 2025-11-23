@@ -5,10 +5,11 @@ import TerminalSnake from "./TerminalSnake";
 import TerminalTypingGame from "./TerminalTypingGame";
 import TerminalKeyboard from "./TerminalKeyboard";
 import { blogPosts } from "@/blog/posts";
+import { playSound } from "@/lib/audio";
 
 interface TerminalLine {
-  type: "input" | "output" | "error" | "success";
-  content: string;
+  type: "input" | "output" | "error" | "success" | "system";
+  content: React.ReactNode | string;
 }
 
 interface TerminalContentProps {
@@ -19,8 +20,7 @@ interface TerminalContentProps {
 
 export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = false }: TerminalContentProps) => {
   const [input, setInput] = useState("");
-  const [suggestion, setSuggestion] = useState("");
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [history, setHistory] = useState<TerminalLine[]>(initialHistory);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -31,31 +31,21 @@ export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = fal
   const { copyToClipboard } = useBrutalistToast();
 
   useEffect(() => {
+    // Initial greeting
+    if (history.length === 0) {
+      setHistory([
+        { type: "system", content: "INITIALIZING SYSTEM..." },
+        { type: "system", content: "CONNECTION ESTABLISHED." },
+        { type: "success", content: "WELCOME, OPERATOR." },
+        { type: "output", content: "Type 'help' for available commands." },
+      ]);
+    }
+
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  const playSound = (type: "key" | "enter" | "error" | "success") => {
-    if (!soundEnabled) return;
-    // ... (sound logic reused)
-    const audioContext = new (window.AudioContext ||
-      // @ts-expect-error - webkitAudioContext for Safari compatibility
-      window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    switch (type) {
-      case "key": oscillator.frequency.value = 800; gainNode.gain.value = 0.05; oscillator.start(); oscillator.stop(audioContext.currentTime + 0.03); break;
-      case "enter": oscillator.frequency.value = 600; gainNode.gain.value = 0.1; oscillator.start(); oscillator.stop(audioContext.currentTime + 0.08); break;
-      case "error": oscillator.frequency.value = 200; gainNode.gain.value = 0.15; oscillator.start(); oscillator.stop(audioContext.currentTime + 0.15); break;
-      case "success": oscillator.frequency.value = 1000; gainNode.gain.value = 0.1; oscillator.start(); oscillator.stop(audioContext.currentTime + 0.1); break;
-    }
-  };
 
   // Auto-scroll
   useEffect(() => {
@@ -77,8 +67,15 @@ export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = fal
       description: "Show commands",
       action: () => {
         setHistory(prev => [...prev, 
-          { type: "success", content: "AVAILABLE COMMANDS:" },
-          { type: "output", content: "help, about, contact, skills, blog, clear, exit, snake, typing" }
+          { type: "success", content: "AVAILABLE DIRECTIVES:" },
+          { type: "output", content: "  neofetch    // System Summary" },
+          { type: "output", content: "  about       // Operator Profile" },
+          { type: "output", content: "  skills      // Tech Arsenal" },
+          { type: "output", content: "  contact     // Uplinks" },
+          { type: "output", content: "  snake       // Leisure Protocol 1" },
+          { type: "output", content: "  typing      // Leisure Protocol 2" },
+          { type: "output", content: "  clear       // Flush Buffer" },
+          { type: "output", content: "  exit        // Terminate Session" }
         ]);
       }
     },
@@ -100,11 +97,54 @@ export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = fal
     },
     about: {
       description: "About me",
-      action: () => setHistory(prev => [...prev, { type: "success", content: "David Khvedelidze" }, { type: "output", content: "Full-Stack Developer | Angular Specialist" }])
+      action: () => setHistory(prev => [...prev, 
+        { type: "success", content: "IDENTITY: David Khvedelidze" }, 
+        { type: "output", content: "ROLE: Senior Frontend Engineer / Angular Specialist" },
+        { type: "output", content: "ORIGIN: Tbilisi, Georgia" },
+        { type: "output", content: "CURRENT_LOC: Paris, France" },
+        { type: "output", content: "MISSION: Building high-performance enterprise interfaces that don't suck." }
+      ])
     },
     skills: {
       description: "Show skills",
-      action: () => setHistory(prev => [...prev, { type: "output", content: "React, Angular, Node.js, TypeScript, AWS" }])
+      action: () => setHistory(prev => [...prev, 
+        { type: "success", content: "PRIMARY WEAPONS:" },
+        { type: "output", content: "  [*] Angular (Expert)" },
+        { type: "output", content: "  [*] TypeScript (Expert)" },
+        { type: "output", content: "  [*] RxJS & NgRx" },
+        { type: "output", content: "  [*] Tailwind CSS" },
+        { type: "output", content: "  [-] React (Proficient)" },
+        { type: "output", content: "  [-] Node.js" }
+      ])
+    },
+    contact: {
+      description: "Contact info",
+      action: () => setHistory(prev => [...prev,
+        { type: "success", content: "COMMUNICATION CHANNELS:" },
+        { type: "output", content: "  EMAIL: davidkhvedelidze@gmail.com" },
+        { type: "output", content: "  LINKEDIN: /in/khvedelidzedavid" },
+        { type: "output", content: "  GITHUB: @khvedelidzedavid" }
+      ])
+    },
+    neofetch: {
+      description: "System info",
+      action: () => setHistory(prev => [...prev, 
+        { type: "output", content: 
+          <pre className="text-xs leading-tight text-primary font-bold">
+{`
+       /\\        OS: BrutalistOS v2.0
+      /  \\       KERNEL: React 18.x
+     / /\\ \\      UPTIME: 4 Years
+    / /  \\ \\     SHELL: ZSH (Zen Style Hacker)
+   / /    \\ \\    CPU: Angular Specialist
+  / /      \\ \\   GPU: Tailwind CSS
+ / /________\\ \\  MEMORY: Infinite Learner
+/____________\\ \\ 
+\\_____________\\/ 
+`}
+          </pre>
+        }
+      ])
     }
   };
 
@@ -118,13 +158,13 @@ export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = fal
     setHistoryIndex(-1);
 
     if (!trimmed) return;
-    playSound("enter");
+    if (soundEnabled) playSound("enter");
 
     if (commands[commandName]) {
       commands[commandName].action();
     } else {
       setHistory(prev => [...prev, { type: "error", content: `Command not found: ${commandName}` }]);
-      playSound("error");
+      if (soundEnabled) playSound("error");
     }
   };
 
@@ -148,7 +188,7 @@ export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = fal
         <div className="flex justify-between items-center mb-2 border-b border-foreground/20 pb-2">
           <div className="flex items-center gap-2">
             <TerminalIcon size={16} />
-            <span className="font-bold">TERMINAL</span>
+            <span className="font-bold">TERMINAL_ACCESS</span>
           </div>
           <button onClick={() => setSoundEnabled(!soundEnabled)}>
             {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
@@ -156,23 +196,34 @@ export const TerminalContent = ({ initialHistory = [], onClose, isEmbedded = fal
         </div>
       )}
       
-      <div ref={historyRef} className="flex-1 overflow-auto space-y-1 mb-2 min-h-0">
+      <div ref={historyRef} className="flex-1 overflow-auto space-y-1 mb-2 min-h-0 font-mono">
         {history.map((line, i) => (
-          <div key={i} className={`${line.type === 'input' ? 'text-primary font-bold' : line.type === 'error' ? 'text-red-500' : line.type === 'success' ? 'text-green-500' : 'text-foreground'}`}>
+          <div key={i} className={`
+            ${line.type === 'input' ? 'text-foreground font-bold' : ''}
+            ${line.type === 'error' ? 'text-destructive' : ''}
+            ${line.type === 'success' ? 'text-success' : ''}
+            ${line.type === 'system' ? 'text-muted-foreground text-xs' : ''}
+            ${line.type === 'output' ? 'text-foreground/80' : ''}
+          `}>
             {line.content}
           </div>
         ))}
       </div>
 
       <form onSubmit={handleSubmit} className="flex items-center gap-2 shrink-0">
-        <span className="text-primary font-bold">&gt;</span>
+        <span className="text-primary font-bold animate-pulse">_</span>
         <input 
           ref={inputRef}
           type="text" 
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 bg-transparent outline-none caret-primary"
+          onChange={(e) => {
+            setInput(e.target.value);
+            if (soundEnabled) playSound('type');
+          }}
+          className="flex-1 bg-transparent outline-none caret-transparent text-foreground"
           autoFocus
+          spellCheck={false}
+          autoComplete="off"
         />
       </form>
     </div>
