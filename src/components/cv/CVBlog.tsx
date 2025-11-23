@@ -13,12 +13,14 @@ import { getLatestPosts } from "@/blog/posts";
 import { getPublishedCourses } from "@/courses/courses";
 import { Badge } from "../ui/badge";
 import { getBlogUrl, getCoursesUrl } from "@/lib/navigation";
+import RobotTrigger from "../RobotTrigger";
 
 const CVBlog = () => {
   const latestPosts = getLatestPosts(3);
   const courses = getPublishedCourses();
 
   return (
+    <RobotTrigger mode="contact">
     <section className="mb-20 print-break-avoid relative" data-section="blog">
       <motion.div
         className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
@@ -126,6 +128,7 @@ const CVBlog = () => {
         </a>
       </div>
     </section>
+    </RobotTrigger>
   );
 };
 

@@ -13,6 +13,8 @@ const CVLanguages = lazy(() => import("@/components/cv/CVLanguages"));
 const CVBlog = lazy(() => import("@/components/cv/CVBlog"));
 import BrutalistProgressBar from "@/components/BrutalistProgressBar";
 import ASCIILoadingScreen from "@/components/ASCIILoadingScreen";
+import { RobotProvider } from "@/context/RobotContext";
+import GyroCore from "@/components/three/GyroCore";
 
 const Index = () => {
   const [isDark, setIsDark] = useState(false);
@@ -39,7 +41,7 @@ const Index = () => {
   };
 
   return (
-    <>
+    <RobotProvider>
       {/* Global Atmospheric Effects */}
       <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03] mix-blend-overlay">
         <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KPC9zdmc+')] opacity-50" />
@@ -62,6 +64,18 @@ const Index = () => {
            
           {/* Background Grid - Fixed */}
           <div className="fixed inset-0 bg-grid-large opacity-[0.03] pointer-events-none" />
+
+          {/* Fixed Robot Companion */}
+          <div className="fixed inset-0 z-0 pointer-events-none">
+             {/* Enable pointer events for the canvas only so scroll works elsewhere but we can click robot if needed? 
+                 Actually GyroCore handles its own div. Let's just place it.
+                 The GyroCore component returns a div with w-full h-full fixed... 
+                 Wait, let's check GyroCore implementation again.
+                 It has `div className="w-full h-full fixed inset-0 pointer-events-none z-0"`. 
+                 So I can just drop it here. 
+             */}
+             <GyroCore color="hsl(var(--primary))" />
+          </div>
 
           {/* Brutalist progress bar */}
           <BrutalistProgressBar />
@@ -143,7 +157,7 @@ const Index = () => {
           </motion.footer>
         </div>
       )}
-    </>
+    </RobotProvider>
   );
 };
 

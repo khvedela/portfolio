@@ -2,15 +2,10 @@ import { useRef, useEffect, useState, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useAnimations, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
+import { useRobot } from '../../context/RobotContext';
 
 interface GyroCoreProps {
   color?: string;
-  bgColor?: string;
-}
-
-interface ModelProps {
-  isHovered: boolean;
-  attackTrigger: number;
 }
 
 const ATTACK_ANIMATIONS = [
@@ -21,160 +16,100 @@ const ATTACK_ANIMATIONS = [
   "grab"
 ];
 
-const Model = ({ isHovered, attackTrigger }: ModelProps) => {
+const Model = () => {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF('/robot.glb');
   const { actions } = useAnimations(animations, group);
-  const [hasGreeted, setHasGreeted] = useState(false);
-  const [isAttacking, setIsAttacking] = useState(false);
-  
-  // Responsive Logic
+  const { mode } = useRobot();
   const { viewport } = useThree();
-  const isMobile = viewport.width < 8; // Approximate threshold for 3D viewport width
   
-  // Config based on screen size
-  const modelScale = isMobile ? 1.2 : 1.5;
-  const modelPosition: [number, number, number] = isMobile 
-    ? [0, -2.2, 0]      // Centered on mobile
-    : [2.5, -2.4, 0];   // Offset on desktop
+  const isMobile = viewport.width < 8;
 
-  // Mouse tracking logic - Subtle look-at
+  // Target State
+  const [targetPos, setTargetPos] = useState(new THREE.Vector3(2.5, -2.4, 0));
+  const [targetRot, setTargetRot] = useState(new THREE.Euler(0, Math.PI, 0));
+  
+  // Animation Logic
+  useEffect(() => {
+    if (!actions) return;
+
+    // Stop all current
+    Object.values(actions).forEach(action => action?.fadeOut(0.5));
+
+    let animName = 'iddle';
+    
+    switch (mode) {
+      case 'header':
+        // Logic for header is handled by initial load sequence usually, but here we enforce idle/walk
+        animName = 'iddle';
+        setTargetPos(new THREE.Vector3(isMobile ? 0 : 2.5, isMobile ? -2.2 : -2.4, 0));
+        setTargetRot(new THREE.Euler(0, Math.PI - 0.4, 0));
+        break;
+      case 'about':
+        animName = 'walking'; // Patrol
+        setTargetPos(new THREE.Vector3(isMobile ? 0 : -3.5, -2.4, 0)); // Move Left
+        setTargetRot(new THREE.Euler(0, Math.PI + 0.5, 0));
+        break;
+      case 'skills':
+        animName = 'attackminiguns'; // Show power
+        setTargetPos(new THREE.Vector3(0, -2.4, 1)); // Center and closer
+        setTargetRot(new THREE.Euler(0, Math.PI, 0));
+        break;
+      case 'work':
+        animName = 'walkingstop'; // Observing
+        setTargetPos(new THREE.Vector3(isMobile ? 0 : 3.5, -2.4, 0)); // Move Right
+        setTargetRot(new THREE.Euler(0, Math.PI - 0.5, 0));
+        break;
+      case 'contact':
+        animName = 'hello'; // Greet
+        setTargetPos(new THREE.Vector3(0, -1.5, 3)); // Very close up
+        setTargetRot(new THREE.Euler(0, Math.PI, 0));
+        break;
+    }
+
+    const action = actions[animName];
+    if (action) {
+      action.reset().fadeIn(0.5).play();
+      if (animName === 'hello' || animName.startsWith('attack')) {
+         // Loop attack/hello differently? default loop is fine for now
+      }
+    }
+
+  }, [mode, actions, isMobile]);
+
+  // Frame Loop for Smooth Movement
   useFrame((state) => {
     if (group.current) {
-      const targetRotationX = (state.mouse.y * 0.1); 
-      const targetRotationY = (state.mouse.x * 0.3); 
+      // 1. Move to target position
+      group.current.position.lerp(targetPos, 0.05);
       
-      // We apply this to the group rotation, but we must preserve the base rotation of Math.PI
-      // So we lerp towards Math.PI + mouseOffset
-      group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, Math.PI + targetRotationY, 0.1);
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetRotationX, 0.1);
+      // 2. Rotate to target rotation (base)
+      // We interpolate the rotation manually or use quaternions ideally, but simple Euler lerp for Y works here
+      // actually lerping Euler is dangerous (gimbal lock), but for simple Y axis it's usually ok.
+      // Let's just lerp the Y and X slightly for mouse look on top.
+      
+      const mouseLookX = (state.mouse.y * 0.1);
+      const mouseLookY = (state.mouse.x * 0.2);
+
+      const currentY = group.current.rotation.y;
+      const targetY = targetRot.y + mouseLookY;
+      
+      // Simple lerp for float
+      group.current.rotation.y = THREE.MathUtils.lerp(currentY, targetY, 0.1);
+      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetRot.x + mouseLookX, 0.1);
     }
   });
 
-  // 1. Initial Greeting
-  useEffect(() => {
-    if (actions && !hasGreeted) {
-      const hello = actions['hello'];
-      const jump = actions['jump'];
-      const idle = actions['iddle']; 
-
-      if (hello && jump && idle) {
-        // Ensure others are stopped
-        actions['walking']?.stop();
-        
-        hello.reset().fadeIn(0.5).setLoop(THREE.LoopOnce, 1).play();
-        hello.clampWhenFinished = true;
-
-        const helloDuration = hello.getClip().duration * 1000;
-        const jumpDuration = jump.getClip().duration * 1000;
-
-        const jumpTimeout = setTimeout(() => {
-           hello.fadeOut(0.3);
-           jump.reset().fadeIn(0.3).setLoop(THREE.LoopOnce, 1).play();
-           jump.clampWhenFinished = true;
-        }, helloDuration - 300);
-
-        const idleTimeout = setTimeout(() => {
-           jump.fadeOut(0.5);
-           idle.reset().fadeIn(0.5).play();
-           setHasGreeted(true);
-        }, helloDuration + jumpDuration - 600);
-
-        return () => {
-          clearTimeout(jumpTimeout);
-          clearTimeout(idleTimeout);
-        };
-      }
-    }
-  }, [actions, hasGreeted]);
-
-  // 2. Attack Trigger (Click)
-  useEffect(() => {
-    if (!actions || !hasGreeted || attackTrigger === 0) return;
-
-    const idle = actions['iddle'];
-    const walking = actions['walking'];
-    const randomAttackName = ATTACK_ANIMATIONS[Math.floor(Math.random() * ATTACK_ANIMATIONS.length)];
-    const attack = actions[randomAttackName];
-
-    if (attack) {
-      setIsAttacking(true);
-      
-      // Fade out current state (idle or walking)
-      idle?.fadeOut(0.2);
-      walking?.fadeOut(0.2);
-
-      // Play attack
-      attack.reset().fadeIn(0.2).setLoop(THREE.LoopOnce, 1).play();
-      attack.clampWhenFinished = true;
-
-      const duration = attack.getClip().duration * 1000;
-      
-      const timeout = setTimeout(() => {
-        attack.fadeOut(0.5);
-        setIsAttacking(false);
-        // Return to state will be handled by the Hover effect below
-      }, duration - 200);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [attackTrigger, actions, hasGreeted]);
-
-  // 3. Hover State (Walking vs Idle)
-  useEffect(() => {
-    if (!actions || !hasGreeted || isAttacking) return;
-
-    const idle = actions['iddle'];
-    const walking = actions['walking'];
-
-    if (idle && walking) {
-      if (isHovered) {
-        idle.fadeOut(0.4);
-        walking.reset().fadeIn(0.4).play();
-      } else {
-        walking.fadeOut(0.4);
-        idle.reset().fadeIn(0.4).play();
-      }
-    }
-  }, [isHovered, isAttacking, actions, hasGreeted]);
-
-  // If we just finished attacking, we need to restore the correct state (Walk or Idle)
-  useEffect(() => {
-    if (!isAttacking && hasGreeted && actions) {
-      const idle = actions['iddle'];
-      const walking = actions['walking'];
-      
-      if (isHovered) {
-        walking?.reset().fadeIn(0.5).play();
-      } else {
-        idle?.reset().fadeIn(0.5).play();
-      }
-    }
-  }, [isAttacking, isHovered, hasGreeted, actions]);
-
   return (
-    <group dispose={null}>
-      {/* Group for rotation/positioning */}
-      <group ref={group} position={modelPosition} rotation={[0, Math.PI, 0]}>
-         <primitive object={scene} scale={modelScale} />
-      </group>
-      <ContactShadows position={[modelPosition[0], -2.4, 0]} opacity={0.5} scale={10} blur={2} far={4} />
+    <group ref={group} dispose={null}>
+      <primitive object={scene} scale={1.5} />
     </group>
   );
 };
 
-const GyroCore = ({ color = '#00ffc0', bgColor = 'transparent' }: GyroCoreProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [attackTrigger, setAttackTrigger] = useState(0);
-
+const GyroCore = ({ color = '#00ffc0' }: GyroCoreProps) => {
   return (
-    <div 
-      className="w-full h-full cursor-pointer" 
-      onMouseEnter={() => setIsHovered(true)} 
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => setAttackTrigger(Date.now())}
-      title="Click for combat simulation"
-    >
+    <div className="w-full h-full fixed inset-0 pointer-events-none z-0">
       <Canvas 
         camera={{ position: [0, 0.5, 11], fov: 30 }} 
         gl={{ alpha: true, antialias: true }}
@@ -182,25 +117,16 @@ const GyroCore = ({ color = '#00ffc0', bgColor = 'transparent' }: GyroCoreProps)
         shadows
       >
         <Environment preset="city" />
-        
         <ambientLight intensity={0.6} />
-        <spotLight 
-          position={[10, 10, 10]} 
-          angle={0.15} 
-          penumbra={1} 
-          intensity={1.5} 
-          castShadow 
-        />
-        <spotLight 
-          position={[-5, 5, -5]} 
-          intensity={3} 
-          color={color}
-        />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
+        <spotLight position={[-5, 5, -5]} intensity={3} color={color} />
 
         <Suspense fallback={null}>
-          <Model isHovered={isHovered} attackTrigger={attackTrigger} />
+          <Model />
         </Suspense>
         
+        {/* Shadow needs to follow the robot roughly, or just cover the floor */}
+        <ContactShadows position={[0, -2.4, 0]} opacity={0.5} scale={20} blur={2} far={4} />
       </Canvas>
     </div>
   );

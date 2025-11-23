@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import RobotTrigger from "../RobotTrigger";
 
 const CVCaseStudies = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
@@ -117,6 +118,7 @@ const CVCaseStudies = () => {
   ];
 
   return (
+    <RobotTrigger mode="work">
     <section className="mb-20 print-break-avoid relative" data-section="work">
       <motion.div
         className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
@@ -278,6 +280,7 @@ const CVCaseStudies = () => {
         ))}
       </div>
     </section>
+    </RobotTrigger>
   );
 };
 

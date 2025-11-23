@@ -1,5 +1,7 @@
 import { Code, Wrench, Cloud, Lightbulb, Shield, Cpu, Terminal, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
+import RobotTrigger from "../RobotTrigger";
+import CVSystemMonitor from "./CVSystemMonitor";
 
 const CVTechStack = () => {
   const techChoices = [
@@ -46,6 +48,7 @@ const CVTechStack = () => {
   ];
 
   return (
+    <RobotTrigger mode="skills">
     <section className="mb-20 print-break-avoid relative" data-section="tech">
       <motion.div
         className="flex items-end gap-4 mb-8 border-b-3 border-foreground pb-2"
@@ -117,32 +120,37 @@ const CVTechStack = () => {
         ))}
       </div>
 
-      {/* Warning / Philosophy Block */}
-      <motion.div
-        className="mt-12 border-4 border-warning bg-warning/5 relative p-6 md:p-8"
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-      >
-        {/* Striped Warning Bar */}
-        <div className="absolute top-0 left-0 right-0 h-4 bg-[repeating-linear-gradient(45deg,#000,#000_10px,#facc15_10px,#facc15_20px)] opacity-80" />
-        
-        <div className="flex items-start gap-4 mt-4">
-           <div className="bg-warning text-warning-foreground p-3 shrink-0">
-             <AlertTriangle size={32} />
-           </div>
-           <div>
-             <h3 className="text-xl font-display font-bold uppercase text-warning-foreground mb-2">System Override // Philosophy</h3>
-             <p className="font-mono text-sm md:text-base leading-relaxed text-foreground/90">
-               I'm not married to any of these. The best tool is the one that solves the problem without creating new ones. 
-               I've seen teams waste months migrating to the <span className="font-bold bg-warning/30 px-1">"hot new framework"</span> just to end up with the same bugs in different syntax. 
-               <br/><br/>
-               <span className="font-bold border-b-2 border-foreground">Pick boring technology that works. Ship fast. Iterate.</span>
-             </p>
-           </div>
-        </div>
-      </motion.div>
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Warning / Philosophy Block */}
+        <motion.div
+          className="border-4 border-warning bg-warning/5 relative p-6 md:p-8"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+        >
+          {/* Striped Warning Bar */}
+          <div className="absolute top-0 left-0 right-0 h-4 bg-[repeating-linear-gradient(45deg,#000,#000_10px,#facc15_10px,#facc15_20px)] opacity-80" />
+          
+          <div className="flex items-start gap-4 mt-4">
+             <div className="bg-warning text-warning-foreground p-3 shrink-0">
+               <AlertTriangle size={32} />
+             </div>
+             <div>
+               <h3 className="text-xl font-display font-bold uppercase text-warning-foreground mb-2">System Override</h3>
+               <p className="font-mono text-sm leading-relaxed text-foreground/90">
+                 I'm not married to any of these. The best tool is the one that solves the problem without creating new ones.
+                 <br/><br/>
+                 <span className="font-bold border-b-2 border-foreground">Pick boring technology that works. Ship fast. Iterate.</span>
+               </p>
+             </div>
+          </div>
+        </motion.div>
+
+        {/* Live System Monitor */}
+        <CVSystemMonitor />
+      </div>
     </section>
+    </RobotTrigger>
   );
 };
 

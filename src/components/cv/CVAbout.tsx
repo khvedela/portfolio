@@ -1,5 +1,6 @@
 import { User, Database, Target, Cpu } from "lucide-react";
 import { motion } from "framer-motion";
+import RobotTrigger from "../RobotTrigger";
 
 const CVAbout = () => {
   const containerVariants = {
@@ -21,6 +22,7 @@ const CVAbout = () => {
   };
 
   return (
+    <RobotTrigger mode="about">
     <section className="mb-20 print-break-avoid relative" data-section="about">
       {/* Section Header */}
       <motion.div 
@@ -102,6 +104,7 @@ const CVAbout = () => {
         </motion.div>
       </motion.div>
     </section>
+    </RobotTrigger>
   );
 };
 

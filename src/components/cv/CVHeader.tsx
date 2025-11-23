@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useBrutalistToast } from "@/hooks/useBrutalistToast";
 import BrutalistToast from "../BrutalistToast";
-import GyroCore from "../three/GyroCore"; 
 import DecryptedText from "../DecryptedText";
+import RobotTrigger from "../RobotTrigger";
 
 const CVHeader = () => {
   const [hoveredIcon, setHoveredIcon] = useState<number | null>(null);
@@ -49,14 +49,10 @@ const CVHeader = () => {
   };
 
   return (
-    <header className="relative bg-background text-foreground pt-12 pb-8 px-4 md:px-0 mb-12 overflow-hidden">
+    <RobotTrigger mode="header" className="relative">
+    <header className="relative text-foreground pt-12 pb-8 px-4 md:px-0 mb-12 overflow-hidden min-h-[80vh] flex flex-col justify-center">
       {/* Background Grid/Noise */}
       <div className="absolute inset-0 bg-grid-large opacity-[0.05] pointer-events-none z-0" />
-
-      {/* Background 3D Model */}
-      <div className="absolute inset-0 z-0 pointer-events-auto opacity-50 md:opacity-100">
-         <GyroCore color="hsl(var(--primary))" bgColor="transparent" />
-      </div>
 
       <div className="max-w-4xl mx-auto relative z-10 pointer-events-none">
         {/* Top Status Bar */}
@@ -184,6 +180,7 @@ const CVHeader = () => {
         onClose={hideToast}
       />
     </header>
+    </RobotTrigger>
   );
 };
 
